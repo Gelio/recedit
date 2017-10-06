@@ -1,0 +1,11 @@
+{
+  "extends": "tslint-microsoft-contrib",
+  "rules": {
+    "no-import-side-effect": false,
+    "linebreak-style": [true, "CRLF"],
+    "missing-jsdoc": false,
+    "no-console": {
+      "severity": "warning"
+    }
+  }
+}

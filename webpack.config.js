@@ -15,6 +15,7 @@ module.exports = {
   devServer: {
     contentBase: CONFIG.distPath
   },
+  devtool: 'inline-source-map',
   module: {
     rules: [
       {
@@ -23,8 +24,16 @@ module.exports = {
           fallback: 'style-loader',
           use: 'css-loader'
         })
+      },
+      {
+        test: /\.ts$/,
+        use: 'ts-loader',
+        exclude: /node_modules/
       }
     ]
+  },
+  resolve: {
+    extensions: ['.ts', '.js']
   },
   plugins: [
     new CopyPlugin([{ from: 'public' }]),
