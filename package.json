@@ -28,6 +28,7 @@
     "build:dev": "webpack",
     "build:prod": "webpack -p",
     "watch:dev": "webpack -w",
-    "watch:prod": "webpack -w -p"
+    "watch:prod": "webpack -w -p",
+    "lint": "tslint -p ."
   }
 }
