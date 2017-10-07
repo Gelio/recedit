@@ -4,10 +4,7 @@
     "module": "commonjs",
     "target": "es5",
     "sourceMap": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "es2015"
-    ]
+    "lib": ["dom", "dom.iterable", "es2015"],
+    "baseUrl": "src"
   }
 }
