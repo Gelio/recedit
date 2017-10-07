@@ -6,6 +6,7 @@
     "missing-jsdoc": false,
     "no-console": {
       "severity": "warning"
-    }
+    },
+    "typedef": [true, "parameter", "property-declaration"]
   }
 }
