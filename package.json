@@ -50,6 +50,7 @@
       "js",
       "jsx",
       "json"
-    ]
+    ],
+    "moduleDirectories": ["src", "node_modules"]
   }
 }
