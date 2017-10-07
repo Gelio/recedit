@@ -3,7 +3,8 @@ const CopyPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const CONFIG = {
-  distPath: path.resolve(__dirname, 'dist')
+  distPath: path.resolve(__dirname, 'dist'),
+  srcPath: path.resolve(__dirname, 'src')
 };
 
 module.exports = {
@@ -26,6 +27,14 @@ module.exports = {
         })
       },
       {
+        test: /\.scss$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          'sass-loader'
+        ]
+      },
+      {
         test: /\.ts$/,
         use: ['ts-loader', 'tslint-loader'],
         exclude: /node_modules/
@@ -33,7 +42,11 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.ts', '.js']
+    extensions: ['.ts', '.js'],
+    modules: [
+      CONFIG.srcPath,
+      'node_modules'
+    ]
   },
   plugins: [
     new CopyPlugin([{ from: 'public' }]),
