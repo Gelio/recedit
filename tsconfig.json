@@ -5,6 +5,7 @@
     "target": "es2015",
     "sourceMap": true,
     "lib": ["dom", "dom.iterable", "es2015"],
-    "baseUrl": "src"
+    "baseUrl": "src",
+    "strict": true
   }
 }
