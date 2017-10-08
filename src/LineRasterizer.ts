@@ -1,6 +1,7 @@
 import { Octant } from 'common/Octant';
 import { Point } from 'common/Point';
 
+// Transformations from a specific octant to the first octant
 const octantVectorTransformations = {
   [Octant.First]: (p: Point) => p,
   [Octant.Second]: (p: Point) => new Point(p.y, p.x),
@@ -12,6 +13,7 @@ const octantVectorTransformations = {
   [Octant.Eighth]: (p: Point) => new Point(p.x, -p.y)
 };
 
+// Transformations from the first octant to a specific octant
 const reverseOctantVectorTransformations = {
   [Octant.First]: (p: Point) => p,
   [Octant.Second]: (p: Point) => new Point(p.y, p.x),
@@ -24,15 +26,26 @@ const reverseOctantVectorTransformations = {
 };
 
 export class LineRasterizer {
-  public rasterizeLine(startPoint: Point, endPoint: Point, thickness: number): Point[] {
+  public rasterizeLine(
+    startPoint: Point,
+    endPoint: Point,
+    thickness: number
+  ): Point[] {
     const translationVector = Point.subtract(endPoint, startPoint);
     const translationVectorOctant = translationVector.getOctant();
-    const vectorTransformation = octantVectorTransformations[translationVectorOctant];
-    const reverseVectorTransformation = reverseOctantVectorTransformations[translationVectorOctant];
+    const vectorTransformation =
+      octantVectorTransformations[translationVectorOctant];
+    const reverseVectorTransformation =
+      reverseOctantVectorTransformations[translationVectorOctant];
 
-    const rasterizedTransformedLine = this.rasterizeLineFirstQuadrant(vectorTransformation(translationVector), thickness);
+    const rasterizedTransformedLine = this.rasterizeLineFirstQuadrant(
+      vectorTransformation(translationVector),
+      thickness
+    );
 
-    return rasterizedTransformedLine.map(point => Point.add(reverseVectorTransformation(point), startPoint));
+    return rasterizedTransformedLine.map(point =>
+      Point.add(reverseVectorTransformation(point), startPoint)
+    );
   }
 
   private rasterizeLineFirstQuadrant(endPoint: Point, thickness: number) {
@@ -46,7 +59,10 @@ export class LineRasterizer {
     let d = 2 * dy - dx;
     let x = 0;
     let y = 0;
-    for (const point of this.getThickPoint(new Point(x, y), thickness)) {
+    for (const point of this.getThickPointsIteratorInFirstQuadrant(
+      new Point(x, y),
+      thickness
+    )) {
       rasterizedLine.push(point);
     }
 
@@ -59,7 +75,10 @@ export class LineRasterizer {
       }
       x += 1;
 
-      for (const point of this.getThickPoint(new Point(x, y), thickness)) {
+      for (const point of this.getThickPointsIteratorInFirstQuadrant(
+        new Point(x, y),
+        thickness
+      )) {
         rasterizedLine.push(point);
       }
     }
@@ -67,7 +86,10 @@ export class LineRasterizer {
     return rasterizedLine;
   }
 
-  private *getThickPoint(point: Point, thickness: number) {
+  private *getThickPointsIteratorInFirstQuadrant(
+    point: Point,
+    thickness: number
+  ) {
     let dy = 1;
 
     yield point;
