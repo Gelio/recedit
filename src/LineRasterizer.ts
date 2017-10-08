@@ -1,7 +1,7 @@
 import { Point } from 'common/Point';
 
 export class LineRasterizer {
-  public rasterizeLine(startPoint: Point, endPoint: Point, thickness: number = 1) {
+  public rasterizeLine(startPoint: Point, endPoint: Point, thickness: number) {
     const rasterizedLine: Point[] = [];
 
     const dx = endPoint.x - startPoint.x;

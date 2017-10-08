@@ -32,12 +32,22 @@ export class Renderer {
     this.renderingContext.fillRect(x, y, 1, 1);
   }
 
-  public drawLine(startPoint: Point, endPoint: Point, lineProperties: Partial<LineProperties> = {}) {
+  public drawLine(
+    startPoint: Point,
+    endPoint: Point,
+    lineProperties: Partial<LineProperties> = {}
+  ) {
     lineProperties.color = lineProperties.color || COLORS.BLACK;
     lineProperties.thickness = lineProperties.thickness || 1;
 
-    const rasterizedLinePoints = this.lineRasterizer.rasterizeLine(startPoint, endPoint, lineProperties.thickness);
+    const rasterizedLinePoints = this.lineRasterizer.rasterizeLine(
+      startPoint,
+      endPoint,
+      lineProperties.thickness
+    );
 
-    rasterizedLinePoints.forEach(point => this.drawPoint(point, lineProperties.color));
+    rasterizedLinePoints.forEach(point =>
+      this.drawPoint(point, lineProperties.color)
+    );
   }
 }
