@@ -19,7 +19,12 @@ export class Renderer {
 
   constructor(canvas: HTMLCanvasElement, dependencies: RendererDependencies) {
     this.canvas = canvas;
-    this.renderingContext = canvas.getContext('2d');
+    const context = canvas.getContext('2d');
+    if (context === null) {
+      throw new Error('Cannot get canvas 2d rendering context');
+    }
+
+    this.renderingContext = context;
     this.lineRasterizer = dependencies.lineRasterizer;
   }
 

@@ -1,18 +1,68 @@
+import { Octant } from 'common/Octant';
 import { Point } from 'common/Point';
 
+// Transformations from a specific octant to the first octant
+const octantVectorTransformations = {
+  [Octant.First]: (p: Point) => p,
+  [Octant.Second]: (p: Point) => new Point(p.y, p.x),
+  [Octant.Third]: (p: Point) => new Point(p.y, -p.x),
+  [Octant.Fourth]: (p: Point) => new Point(-p.x, p.y),
+  [Octant.Fifth]: (p: Point) => new Point(-p.x, -p.y),
+  [Octant.Sixth]: (p: Point) => new Point(-p.y, -p.x),
+  [Octant.Seventh]: (p: Point) => new Point(-p.y, p.x),
+  [Octant.Eighth]: (p: Point) => new Point(p.x, -p.y)
+};
+
+// Transformations from the first octant to a specific octant
+const reverseOctantVectorTransformations = {
+  [Octant.First]: (p: Point) => p,
+  [Octant.Second]: (p: Point) => new Point(p.y, p.x),
+  [Octant.Third]: (p: Point) => new Point(-p.y, p.x),
+  [Octant.Fourth]: (p: Point) => new Point(-p.x, p.y),
+  [Octant.Fifth]: (p: Point) => new Point(-p.x, -p.y),
+  [Octant.Sixth]: (p: Point) => new Point(-p.y, -p.x),
+  [Octant.Seventh]: (p: Point) => new Point(p.y, -p.x),
+  [Octant.Eighth]: (p: Point) => new Point(p.x, -p.y)
+};
+
 export class LineRasterizer {
-  public rasterizeLine(startPoint: Point, endPoint: Point, thickness: number) {
+  public rasterizeLine(
+    startPoint: Point,
+    endPoint: Point,
+    thickness: number
+  ): Point[] {
+    const translationVector = Point.subtract(endPoint, startPoint);
+    const translationVectorOctant = translationVector.getOctant();
+    const vectorTransformation =
+      octantVectorTransformations[translationVectorOctant];
+    const reverseVectorTransformation =
+      reverseOctantVectorTransformations[translationVectorOctant];
+
+    const rasterizedTransformedLine = this.rasterizeLineFirstQuadrant(
+      vectorTransformation(translationVector),
+      thickness
+    );
+
+    return rasterizedTransformedLine.map(point =>
+      Point.add(reverseVectorTransformation(point), startPoint)
+    );
+  }
+
+  private rasterizeLineFirstQuadrant(endPoint: Point, thickness: number) {
     const rasterizedLine: Point[] = [];
 
-    const dx = endPoint.x - startPoint.x;
-    const dy = endPoint.y - startPoint.y;
+    const dx = endPoint.x;
+    const dy = endPoint.y;
     const incrementE = 2 * dy;
     const incrementNE = 2 * (dy - dx);
 
     let d = 2 * dy - dx;
-    let x = startPoint.x;
-    let y = startPoint.y;
-    for (const point of this.getThickPoint(new Point(x, y), thickness)) {
+    let x = 0;
+    let y = 0;
+    for (const point of this.getThickPointsIteratorInFirstQuadrant(
+      new Point(x, y),
+      thickness
+    )) {
       rasterizedLine.push(point);
     }
 
@@ -25,7 +75,10 @@ export class LineRasterizer {
       }
       x += 1;
 
-      for (const point of this.getThickPoint(new Point(x, y), thickness)) {
+      for (const point of this.getThickPointsIteratorInFirstQuadrant(
+        new Point(x, y),
+        thickness
+      )) {
         rasterizedLine.push(point);
       }
     }
@@ -33,7 +86,10 @@ export class LineRasterizer {
     return rasterizedLine;
   }
 
-  private *getThickPoint(point: Point, thickness: number) {
+  private *getThickPointsIteratorInFirstQuadrant(
+    point: Point,
+    thickness: number
+  ) {
     let dy = 1;
 
     yield point;

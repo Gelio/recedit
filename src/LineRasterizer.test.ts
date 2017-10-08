@@ -428,10 +428,7 @@ describe('LineRasterizer', () => {
           const translatedPoint = rasterizedTranslatedLine[index];
 
           expect(Point.subtract(point, startPoint)).toEqual(
-            Point.subtract(
-              translatedPoint,
-              translatedStartPoint
-            )
+            Point.subtract(translatedPoint, translatedStartPoint)
           );
         });
       });
