@@ -334,5 +334,59 @@ describe('LineRasterizer', () => {
         });
       });
     });
+
+    describe('with thickness', () => {
+      it('should return double the amount of points for thickness 2', () => {
+        const startPoint = new Point(0, 0);
+        const endPoint = new Point(5, 5);
+
+        const thinRasterizedLine = lineRasterizer.rasterizeLine(
+          startPoint,
+          endPoint,
+          1
+        );
+
+        const thickness = 2;
+        const thickRasterizedLine = lineRasterizer.rasterizeLine(startPoint, endPoint, thickness);
+
+        expect(thickRasterizedLine.length).toBe(thinRasterizedLine.length * thickness);
+      });
+
+      it('should return triple the amount of points for thickness 3', () => {
+        const startPoint = new Point(0, 0);
+        const endPoint = new Point(5, 5);
+
+        const thinRasterizedLine = lineRasterizer.rasterizeLine(
+          startPoint,
+          endPoint,
+          1
+        );
+
+        const thickness = 3;
+        const thickRasterizedLine = lineRasterizer.rasterizeLine(startPoint, endPoint, thickness);
+
+        expect(thickRasterizedLine.length).toBe(thinRasterizedLine.length * thickness);
+      });
+
+      it('should return five times the amount of points for thickness 5', () => {
+        const startPoint = new Point(0, 0);
+        const endPoint = new Point(5, 5);
+
+        const thinRasterizedLine = lineRasterizer.rasterizeLine(
+          startPoint,
+          endPoint,
+          1
+        );
+
+        const thickness = 5;
+        const thickRasterizedLine = lineRasterizer.rasterizeLine(startPoint, endPoint, thickness);
+
+        expect(thickRasterizedLine.length).toBe(thinRasterizedLine.length * thickness);
+      });
+    });
+
+    describe('lines that start not at origin', () => {
+      // TODO: add tests for lines that start not at the origin (point (0, 0))
+    });
   });
 });
