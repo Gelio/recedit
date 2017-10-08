@@ -347,9 +347,15 @@ describe('LineRasterizer', () => {
         );
 
         const thickness = 2;
-        const thickRasterizedLine = lineRasterizer.rasterizeLine(startPoint, endPoint, thickness);
+        const thickRasterizedLine = lineRasterizer.rasterizeLine(
+          startPoint,
+          endPoint,
+          thickness
+        );
 
-        expect(thickRasterizedLine.length).toBe(thinRasterizedLine.length * thickness);
+        expect(thickRasterizedLine.length).toBe(
+          thinRasterizedLine.length * thickness
+        );
       });
 
       it('should return triple the amount of points for thickness 3', () => {
@@ -363,9 +369,15 @@ describe('LineRasterizer', () => {
         );
 
         const thickness = 3;
-        const thickRasterizedLine = lineRasterizer.rasterizeLine(startPoint, endPoint, thickness);
+        const thickRasterizedLine = lineRasterizer.rasterizeLine(
+          startPoint,
+          endPoint,
+          thickness
+        );
 
-        expect(thickRasterizedLine.length).toBe(thinRasterizedLine.length * thickness);
+        expect(thickRasterizedLine.length).toBe(
+          thinRasterizedLine.length * thickness
+        );
       });
 
       it('should return five times the amount of points for thickness 5', () => {
@@ -379,14 +391,50 @@ describe('LineRasterizer', () => {
         );
 
         const thickness = 5;
-        const thickRasterizedLine = lineRasterizer.rasterizeLine(startPoint, endPoint, thickness);
+        const thickRasterizedLine = lineRasterizer.rasterizeLine(
+          startPoint,
+          endPoint,
+          thickness
+        );
 
-        expect(thickRasterizedLine.length).toBe(thinRasterizedLine.length * thickness);
+        expect(thickRasterizedLine.length).toBe(
+          thinRasterizedLine.length * thickness
+        );
       });
     });
 
     describe('lines that start not at origin', () => {
-      // TODO: add tests for lines that start not at the origin (point (0, 0))
+      it('should work correctly', () => {
+        const startPoint = new Point(10, 20);
+        const endPoint = new Point(5, 7);
+
+        const rasterizedLine = lineRasterizer.rasterizeLine(
+          startPoint,
+          endPoint,
+          1
+        );
+
+        const translatedStartPoint = new Point(0, 0);
+        const translatedEndPoint = Point.subtract(endPoint, startPoint);
+        const rasterizedTranslatedLine = lineRasterizer.rasterizeLine(
+          translatedStartPoint,
+          translatedEndPoint,
+          1
+        );
+
+        expect(rasterizedLine.length).toBe(rasterizedTranslatedLine.length);
+
+        rasterizedLine.forEach((point, index) => {
+          const translatedPoint = rasterizedTranslatedLine[index];
+
+          expect(Point.subtract(point, startPoint)).toEqual(
+            Point.subtract(
+              translatedPoint,
+              translatedStartPoint
+            )
+          );
+        });
+      });
     });
   });
 });
