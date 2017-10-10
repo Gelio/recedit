@@ -3,5 +3,6 @@
     "Rasterizer",
     "rasterize",
     "rasterized"
-  ]
+  ],
+  "prettier.printWidth": 100
 }
