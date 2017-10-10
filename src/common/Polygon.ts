@@ -13,4 +13,19 @@ export class Polygon {
     this.vertices = vertices;
     this.lineProperties = lineProperties;
   }
+
+  public *getVerticesIterator() {
+    const verticesCount = this.vertices.length;
+    for (let i = 0; i < verticesCount; i += 1) {
+      yield this.vertices[i];
+    }
+  }
+
+  public getStartingPoint() {
+    return this.vertices[0];
+  }
+
+  public getLineProperties() {
+    return this.lineProperties;
+  }
 }
