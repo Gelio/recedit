@@ -2,15 +2,22 @@ import 'index.scss';
 import 'normalize.css';
 
 import { COLORS } from 'common/COLORS';
+import { LineProperties } from 'common/LineProperties';
 import { Point } from 'common/Point';
-import { LineRasterizer } from 'LineRasterizer';
+import { LineRasterizer } from 'line-rasterizer/LineRasterizer';
 import { Renderer } from 'Renderer';
+import { UIController } from 'ui/UIController';
 
 window.addEventListener('load', bootstrap, false);
 
 function bootstrap(): void {
   const canvas = <HTMLCanvasElement>document.getElementById('main-canvas');
   const renderer = new Renderer(canvas, { lineRasterizer: new LineRasterizer() });
+  const uiController = new UIController(canvas);
+
+  uiController.init();
+
+  const lineProperties = LineProperties.getDefault();
 
   setInterval(() => {
     const startX = Math.random() * canvas.clientWidth;
@@ -21,7 +28,7 @@ function bootstrap(): void {
     const endY = Math.random() * canvas.clientHeight;
     const endPoint = new Point(endX, endY);
 
-    renderer.drawLine(startPoint, endPoint, { color: COLORS.BLACK, thickness: 2 });
+    renderer.drawLine(startPoint, endPoint, lineProperties);
   }, 1000);
 
   const centerPoint = new Point(canvas.clientWidth / 2, canvas.clientHeight / 2);

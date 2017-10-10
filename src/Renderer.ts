@@ -1,15 +1,12 @@
 import { Color } from 'common/Color';
 import { COLORS } from 'common/COLORS';
+import { LineProperties } from 'common/LineProperties';
 import { Point } from 'common/Point';
-import { LineRasterizer } from 'LineRasterizer';
+import { Polygon } from 'common/Polygon';
+import { LineRasterizer } from 'line-rasterizer/LineRasterizer';
 
 interface RendererDependencies {
   lineRasterizer: LineRasterizer;
-}
-
-interface LineProperties {
-  color: Color;
-  thickness: number;
 }
 
 export class Renderer {
@@ -40,11 +37,8 @@ export class Renderer {
   public drawLine(
     startPoint: Point,
     endPoint: Point,
-    lineProperties: Partial<LineProperties> = {}
+    lineProperties: LineProperties
   ) {
-    lineProperties.color = lineProperties.color || COLORS.BLACK;
-    lineProperties.thickness = lineProperties.thickness || 1;
-
     const rasterizedLinePoints = this.lineRasterizer.rasterizeLine(
       startPoint,
       endPoint,
@@ -54,5 +48,9 @@ export class Renderer {
     rasterizedLinePoints.forEach(point =>
       this.drawPoint(point, lineProperties.color)
     );
+  }
+
+  public drawPolygon(polygon: Polygon) {
+    // TODO
   }
 }
