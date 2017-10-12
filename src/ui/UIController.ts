@@ -1,6 +1,8 @@
 import { Application } from 'Application';
 import { COLORS } from 'common/COLORS';
+import { Layer } from 'common/Layer';
 import { LineProperties } from 'common/LineProperties';
+import { Path } from 'common/Path';
 import { Point } from 'common/Point';
 import { Polygon } from 'common/Polygon';
 import { Renderer } from 'Renderer';
@@ -25,8 +27,13 @@ export class UIController {
   private readonly renderer: Renderer;
   private readonly stage: Stage;
 
+  private readonly polygonLayer = new Layer('PolygonLayer');
+  private readonly pathLayer = new Layer('PathLayer');
+
   private currentState = UIStates.InitialPolygon;
-  private pointsList: Point[] = [];
+  private unfinishedPath: Path;
+  private newLineProperties = new LineProperties(COLORS.BLUE, 2);
+  private newPolygonProperties = new LineProperties(COLORS.RED, 1);
 
   constructor(canvas: HTMLCanvasElement, dependencies: UIControllerDependencies) {
     this.canvas = canvas;
@@ -39,6 +46,9 @@ export class UIController {
   }
 
   public init() {
+    this.stage.layers.push(this.polygonLayer, this.pathLayer);
+    this.startNewUnfinishedPath();
+
     this.canvas.addEventListener('click', this.onClick);
     this.canvas.addEventListener('mousemove', this.onMouseMove);
   }
@@ -46,6 +56,14 @@ export class UIController {
   public destroy() {
     this.canvas.removeEventListener('click', this.onClick);
     this.canvas.removeEventListener('mousemove', this.onMouseMove);
+
+    this.stage.removeLayer(this.pathLayer);
+    this.stage.removeLayer(this.polygonLayer);
+  }
+
+  private startNewUnfinishedPath() {
+    this.unfinishedPath = new Path([], this.newPolygonProperties);
+    this.pathLayer.paths.push(this.unfinishedPath);
   }
 
   private onClick(event: MouseEvent) {
@@ -67,45 +85,37 @@ export class UIController {
   }
 
   private addNewPoint(point: Point) {
-    if (this.pointsList.length >= 3) {
-      const distanceToFirstPoint = Point.getDistanceBetween(point, this.pointsList[0]);
+    let pointHandled = false;
+
+    if (this.unfinishedPath.getVerticesCount() >= 3) {
+      const distanceToFirstPoint = Point.getDistanceBetween(point, this.unfinishedPath.getStartingPoint());
 
       if (distanceToFirstPoint < CLOSING_DISTANCE) {
-        this.stage.polygons.push(new Polygon(this.pointsList, LineProperties.getDefault()));
+        this.polygonLayer.paths.push(new Polygon(this.unfinishedPath.vertices, LineProperties.getDefault()));
 
-        this.pointsList = [];
-        this.application.render();
-
-        return;
+        this.pathLayer.removePath(this.unfinishedPath);
+        this.startNewUnfinishedPath();
+        pointHandled = true;
       }
     }
 
-    this.pointsList.push(point);
+    if (!pointHandled) {
+      this.unfinishedPath.vertices.push(point);
+    }
     this.application.render();
-    this.renderPointsList();
-  }
-
-  private renderPointsList() {
-    const lineProperties = new LineProperties(COLORS.GREEN, 2);
-
-    this.pointsList.reduce((p1, p2) => {
-      this.renderer.drawLine(p1, p2, lineProperties);
-
-      return p2;
-    });
   }
 
   private onMouseMove(event: MouseEvent) {
-    if (this.pointsList.length === 0) {
+    const unfinishedPathVerticesCount = this.unfinishedPath.getVerticesCount();
+    if (unfinishedPathVerticesCount === 0) {
       return;
     }
 
-    const lastPoint = this.pointsList[this.pointsList.length - 1];
+    const lastPoint = this.unfinishedPath.vertices[unfinishedPathVerticesCount - 1];
     this.application.render();
-    this.renderPointsList();
 
     const point = this.getPointFromMouseEvent(event);
-    this.renderer.drawLine(lastPoint, point, new LineProperties(COLORS.RED, 1));
+    this.renderer.drawLine(lastPoint, point, this.newLineProperties);
   }
 
   private getPointFromMouseEvent(event: MouseEvent) {
