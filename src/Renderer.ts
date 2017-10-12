@@ -1,5 +1,6 @@
 import { Color } from 'common/Color';
 import { COLORS } from 'common/COLORS';
+import { Line } from 'common/Line';
 import { LineProperties } from 'common/LineProperties';
 import { Path } from 'common/Path';
 import { Point } from 'common/Point';
@@ -36,29 +37,23 @@ export class Renderer {
     this.renderingContext.fillRect(x, y, 1, 1);
   }
 
-  public drawLine(startPoint: Point, endPoint: Point, lineProperties: LineProperties) {
-    const rasterizedLinePoints = this.lineRasterizer.rasterizeLine(
-      startPoint,
-      endPoint,
-      lineProperties.thickness
-    );
+  public drawLine(line: Line, lineProperties: LineProperties): void;
+  public drawLine(startPoint: Point, endPoint: Point, lineProperties: LineProperties): void;
 
-    this.setFillColor(lineProperties.color);
-    rasterizedLinePoints.forEach(point => this.drawPoint(point));
+  // tslint:disable-next-line no-any
+  public drawLine(...args: any[]) {
+    if (args[0] instanceof Line) {
+      return this.drawLineBetweenPoints(args[0].p1, args[0].p2, args[1]);
+    } else {
+     return this.drawLineBetweenPoints(args[0], args[1], args[2]);
+    }
   }
 
   public drawPath(path: Path) {
     const pathLineProperties = path.getLineProperties();
-    let previousPoint = null;
 
-    for (const point of path.getVerticesIterator()) {
-      if (!previousPoint) {
-        previousPoint = point;
-        continue;
-      }
-
-      this.drawLine(previousPoint, point, pathLineProperties);
-      previousPoint = point;
+    for (const line of path.getLineIterator()) {
+      this.drawLine(line, pathLineProperties);
     }
   }
 
@@ -68,5 +63,16 @@ export class Renderer {
 
   public setFillColor(color: Color) {
     this.renderingContext.fillStyle = color.fillStyle;
+  }
+
+  private drawLineBetweenPoints(startPoint: Point, endPoint: Point, lineProperties: LineProperties) {
+    const rasterizedLinePoints = this.lineRasterizer.rasterizeLine(
+      startPoint,
+      endPoint,
+      lineProperties.thickness
+    );
+
+    this.setFillColor(lineProperties.color);
+    rasterizedLinePoints.forEach(point => this.drawPoint(point));
   }
 }
