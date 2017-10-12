@@ -12,6 +12,7 @@ import { MousePositionTransformer } from 'ui/MousePositionTransformer';
 import { NewPolygonUIController } from 'ui/NewPolygonUIController';
 
 interface UIControllerDependencies {
+  canvas: HTMLCanvasElement;
   application: Application;
   renderer: Renderer;
   stage: Stage;
@@ -29,8 +30,8 @@ export class UIController {
   private applicationUIContainer: HTMLElement;
   private newPolygonUIController: NewPolygonUIController;
 
-  constructor(canvas: HTMLCanvasElement, dependencies: UIControllerDependencies) {
-    this.canvas = canvas;
+  constructor(dependencies: UIControllerDependencies) {
+    this.canvas = dependencies.canvas;
     this.application = dependencies.application;
     this.renderer = dependencies.renderer;
     this.stage = dependencies.stage;
