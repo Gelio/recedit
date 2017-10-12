@@ -3,7 +3,7 @@ import { Line } from 'common/Line';
 import { LineProperties } from 'common/LineProperties';
 import { Point } from 'common/Point';
 
-const HIT_TOLERANCE = 15;
+const HIT_TOLERANCE = 10;
 
 export class Path {
   public closed: boolean = false;
