@@ -7,6 +7,7 @@ import { Point } from 'common/Point';
 import { Polygon } from 'common/Polygon';
 import { Renderer } from 'Renderer';
 import { Stage } from 'Stage';
+import { MousePositionTransformer } from 'ui/MousePositionTransformer';
 
 const CLOSING_DISTANCE = 15;
 
@@ -35,6 +36,8 @@ export class UIController {
   private newLineProperties = new LineProperties(COLORS.BLUE, 2);
   private newPolygonProperties = new LineProperties(COLORS.RED, 1);
 
+  private mousePositionTransformer: MousePositionTransformer;
+
   constructor(canvas: HTMLCanvasElement, dependencies: UIControllerDependencies) {
     this.canvas = canvas;
     this.application = dependencies.application;
@@ -48,6 +51,8 @@ export class UIController {
   public init() {
     this.stage.layers.push(this.polygonLayer, this.pathLayer);
     this.startNewUnfinishedPath();
+
+    this.mousePositionTransformer = new MousePositionTransformer(this.canvas);
 
     this.canvas.addEventListener('click', this.onClick);
     this.canvas.addEventListener('mousemove', this.onMouseMove);
@@ -67,7 +72,7 @@ export class UIController {
   }
 
   private onClick(event: MouseEvent) {
-    const point = this.getPointFromMouseEvent(event);
+    const point = this.mousePositionTransformer.getPointFromMouseEvent(event);
 
     switch (this.currentState) {
       case UIStates.InitialPolygon:
@@ -116,14 +121,7 @@ export class UIController {
     const lastPoint = this.unfinishedPath.vertices[unfinishedPathVerticesCount - 1];
     this.application.render();
 
-    const point = this.getPointFromMouseEvent(event);
+    const point = this.mousePositionTransformer.getPointFromMouseEvent(event);
     this.renderer.drawLine(lastPoint, point, this.newLineProperties);
-  }
-
-  private getPointFromMouseEvent(event: MouseEvent) {
-    return new Point(
-      event.pageX - this.canvas.offsetLeft,
-      event.pageY - this.canvas.offsetTop
-    );
   }
 }
