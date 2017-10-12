@@ -31,4 +31,14 @@ export class Stage {
 
     return null;
   }
+
+  public findLayerByName(name: string): Layer {
+    const foundLayer = this.layers.find(layer => layer.name === name);
+
+    if (!foundLayer) {
+      throw new Error(`Layer with name ${name} does not exist`);
+    }
+
+    return foundLayer;
+  }
 }
