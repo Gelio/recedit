@@ -17,6 +17,14 @@ export class Point {
     return new Point(p1.x - p2.x, p1.y - p2.y);
   }
 
+  public static getDistanceBetween(p1: Point, p2: Point): number {
+    return Math.sqrt(Point.getDistanceBetweenSquared(p1, p2));
+  }
+
+  public static getDistanceBetweenSquared(p1: Point, p2: Point): number {
+    return Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2);
+  }
+
   public getOctant(): Octant {
     const x = this.x;
     const y = this.y;

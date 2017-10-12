@@ -1,5 +1,5 @@
 import { Point } from 'common/Point';
-import { LineRasterizer } from 'LineRasterizer';
+import { LineRasterizer } from 'line-rasterizer/LineRasterizer';
 
 describe('LineRasterizer', () => {
   let lineRasterizer: LineRasterizer;
