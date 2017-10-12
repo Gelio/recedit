@@ -1,4 +1,6 @@
+import { HitTestResult } from 'common/HitTestResult';
 import { Layer } from 'common/Layer';
+import { Point } from 'common/Point';
 import { Renderer } from 'Renderer';
 
 export class Stage {
@@ -15,5 +17,18 @@ export class Stage {
     }
 
     this.layers.splice(index, 1);
+  }
+
+  public hitTest(point: Point): HitTestResult | null {
+    for (const layer of this.layers) {
+      const result = layer.hitTest(point);
+      if (!result) {
+        continue;
+      }
+
+      return result;
+    }
+
+    return null;
   }
 }
