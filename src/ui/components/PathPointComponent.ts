@@ -1,6 +1,8 @@
 import { Path } from 'common/Path';
 import { Point } from 'common/Point';
 
+import 'ui/components/PathPointComponent.scss';
+
 const ENABLED_CLASS_NAME = 'enabled';
 const INITIAL_CLASS_NAME = 'application-ui__vertex--initial';
 
