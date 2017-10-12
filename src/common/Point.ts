@@ -66,4 +66,16 @@ export class Point {
 
     return octant;
   }
+
+  public equals(point: Point): boolean {
+    return this.x === point.x && this.y === point.y;
+  }
+
+  public getDistanceTo(point: Point): number {
+    return Point.getDistanceBetween(this, point);
+  }
+
+  public getDistanceSquaredTo(point: Point): number {
+    return Point.getDistanceBetweenSquared(this, point);
+  }
 }

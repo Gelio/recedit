@@ -1,31 +1,33 @@
 import { LineProperties } from 'common/LineProperties';
+import { Path } from 'common/Path';
 import { Point } from 'common/Point';
 
-export class Polygon {
-  private vertices: Point[];
-  private lineProperties: LineProperties;
+export class Polygon extends Path {
+  constructor(path: Path);
+  constructor(vertices: Point[], lineProperties: LineProperties);
 
-  constructor(vertices: Point[], lineProperties: LineProperties) {
-    if (vertices.length < 3) {
-      throw new Error('Polygon must have at least 3 vertices');
+  constructor(pathOrVertices: Path | Point[], lineProperties?: LineProperties) {
+    let vertices: Point[];
+
+    if (pathOrVertices instanceof Path) {
+      const path = pathOrVertices;
+      vertices = path.vertices;
+      lineProperties = path.lineProperties;
+    } else {
+      vertices = pathOrVertices;
+      lineProperties = <LineProperties>lineProperties;
     }
 
-    this.vertices = vertices;
-    this.lineProperties = lineProperties;
+    Polygon.ensureVerticesLength(vertices);
+    super(vertices, lineProperties);
+    this.closed = true;
   }
 
-  public *getVerticesIterator() {
-    const verticesCount = this.vertices.length;
-    for (let i = 0; i < verticesCount; i += 1) {
-      yield this.vertices[i];
+  private static ensureVerticesLength(vertices: Point[]) {
+    if (vertices.length >= 3) {
+      return;
     }
-  }
 
-  public getStartingPoint() {
-    return this.vertices[0];
-  }
-
-  public getLineProperties() {
-    return this.lineProperties;
+    throw new Error('Polygon must have at least 3 vertices');
   }
 }

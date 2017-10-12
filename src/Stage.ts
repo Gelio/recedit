@@ -1,11 +1,19 @@
-import { Point } from 'common/Point';
-import { Polygon } from 'common/Polygon';
+import { Layer } from 'common/Layer';
+import { Renderer } from 'Renderer';
 
 export class Stage {
-  public polygons: Polygon[] = [];
-  private canvas: HTMLCanvasElement;
+  public layers: Layer[] = [];
 
-  constructor(canvas: HTMLCanvasElement) {
-    this.canvas = canvas;
+  public render(renderer: Renderer) {
+    this.layers.forEach(layer => layer.render(renderer));
+  }
+
+  public removeLayer(layer: Layer) {
+    const index = this.layers.indexOf(layer);
+    if (index === -1) {
+      return;
+    }
+
+    this.layers.splice(index, 1);
   }
 }
