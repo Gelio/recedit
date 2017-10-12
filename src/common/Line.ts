@@ -17,9 +17,11 @@ export class Line {
     const p1 = this.p1;
     const p2 = this.p2;
 
-    const yDelta = p2.y - p1.y;
-    const xDelta = p2.x - p1.x;
+    let t =
+      ((p.x - p1.x) * (p2.x - p1.x) + (p.y - p1.y) * (p2.y - p1.y)) /
+      Point.getDistanceBetweenSquared(p1, p2);
+    t = Math.max(0, Math.min(1, t));
 
-    return Math.abs(yDelta * p.x - xDelta * p.y + p2.x * p1.y - p2.y * p1.x) / Point.getDistanceBetween(p1, p2);
+    return p.getDistanceTo(new Point(p1.x + t * (p2.x - p1.x), p1.y + t * (p2.y - p1.y)));
   }
 }
