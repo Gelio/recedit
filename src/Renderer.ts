@@ -1,8 +1,8 @@
 import { Color } from 'common/Color';
 import { COLORS } from 'common/COLORS';
 import { LineProperties } from 'common/LineProperties';
+import { Path } from 'common/Path';
 import { Point } from 'common/Point';
-import { Polygon } from 'common/Polygon';
 import { LineRasterizer } from 'line-rasterizer/LineRasterizer';
 
 interface RendererDependencies {
@@ -47,22 +47,18 @@ export class Renderer {
     rasterizedLinePoints.forEach(point => this.drawPoint(point));
   }
 
-  public drawPolygon(polygon: Polygon) {
-    const polygonLineProperties = polygon.getLineProperties();
+  public drawPath(path: Path) {
+    const pathLineProperties = path.getLineProperties();
     let previousPoint = null;
 
-    for (const point of polygon.getVerticesIterator()) {
+    for (const point of path.getVerticesIterator()) {
       if (!previousPoint) {
         previousPoint = point;
         continue;
       }
 
-      this.drawLine(previousPoint, point, polygonLineProperties);
+      this.drawLine(previousPoint, point, pathLineProperties);
       previousPoint = point;
-    }
-
-    if (previousPoint) {
-      this.drawLine(previousPoint, polygon.getStartingPoint(), polygonLineProperties);
     }
   }
 
@@ -71,10 +67,6 @@ export class Renderer {
   }
 
   public setFillColor(color: Color) {
-    if (color === this.fillColor) {
-      return;
-    }
-
-    this.renderingContext.fillStyle = color.getFillStyle();
+    this.renderingContext.fillStyle = color.fillStyle;
   }
 }
