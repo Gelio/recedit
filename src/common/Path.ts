@@ -1,6 +1,9 @@
 import { HitTestResult } from 'common/HitTestResult';
+import { Line } from 'common/Line';
 import { LineProperties } from 'common/LineProperties';
 import { Point } from 'common/Point';
+
+const HIT_TOLERANCE = 15;
 
 export class Path {
   public closed: boolean = false;
@@ -23,6 +26,20 @@ export class Path {
     }
   }
 
+  public *getLineIterator() {
+    let previousPoint;
+
+    for (const point of this.getVerticesIterator()) {
+      if (!previousPoint) {
+        previousPoint = point;
+        continue;
+      }
+
+      yield new Line(previousPoint, point);
+      previousPoint = point;
+    }
+  }
+
   public getStartingPoint() {
     return this.vertices[0];
   }
@@ -33,5 +50,15 @@ export class Path {
 
   public getLineProperties() {
     return this.lineProperties;
+  }
+
+  public hitTest(point: Point): HitTestResult | null {
+    for (const line of this.getLineIterator()) {
+      if (line.distanceToPoint(point) <= HIT_TOLERANCE) {
+        return new HitTestResult(line, this);
+      }
+    }
+
+    return null;
   }
 }
