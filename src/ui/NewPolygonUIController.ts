@@ -1,10 +1,9 @@
 import { Application } from 'Application';
-import { COLORS } from 'common/COLORS';
 import { Layer } from 'common/Layer';
-import { LineProperties } from 'common/LineProperties';
 import { Path } from 'common/Path';
 import { Point } from 'common/Point';
 import { Polygon } from 'common/Polygon';
+import { configuration } from 'configuration';
 import { Renderer } from 'Renderer';
 import { Stage } from 'Stage';
 import { PathPointComponent } from 'ui/components/PathPointComponent';
@@ -32,9 +31,6 @@ export class NewPolygonUIController {
   private startingPathPointComponent: PathPointComponent;
   private readonly pathLayer = new Layer('PathLayer');
   private readonly polygonLayer: Layer;
-
-  private readonly newLinePreviewProperties = new LineProperties(COLORS.BLUE, 2);
-  private readonly newPolygonLineProperties = new LineProperties(COLORS.RED, 1);
 
   constructor(dependencies: NewPolygonUIControllerDependencies) {
     this.application = dependencies.application;
@@ -89,21 +85,21 @@ export class NewPolygonUIController {
     this.application.render();
 
     const point = this.mousePositionTransformer.getPointFromMouseEvent(event);
-    this.renderer.drawLine(lastPoint, point, this.newLinePreviewProperties);
+    this.renderer.drawLine(lastPoint, point, configuration.newLinePreviewProperties);
   }
 
   private startNewUnfinishedPath() {
-    this.unfinishedPath = new Path([], this.newPolygonLineProperties);
+    this.unfinishedPath = new Path([], configuration.newPolygonLineProperties);
     this.pathLayer.paths.push(this.unfinishedPath);
   }
 
   private closePath() {
-    if (this.unfinishedPath.getVerticesCount() < 3) {
-      return alert('Polygon must have at least 3 vertices');
+    if (this.unfinishedPath.getVerticesCount() < configuration.minPolygonPoints) {
+      return alert(`Polygon must have at least ${configuration.minPolygonPoints} vertices`);
     }
 
     this.polygonLayer.paths.push(
-      new Polygon(this.unfinishedPath.vertices, LineProperties.getDefault())
+      new Polygon(this.unfinishedPath.vertices, configuration.polygonLineProperties)
     );
 
     this.pathLayer.removePath(this.unfinishedPath);

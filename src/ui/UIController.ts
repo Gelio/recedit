@@ -5,6 +5,8 @@ import { LineProperties } from 'common/LineProperties';
 import { Path } from 'common/Path';
 import { Point } from 'common/Point';
 import { Polygon } from 'common/Polygon';
+import { configuration } from 'configuration';
+import { LEX } from 'LEX';
 import { Renderer } from 'Renderer';
 import { Stage } from 'Stage';
 import { PathPointComponent } from 'ui/components/PathPointComponent';
@@ -24,7 +26,7 @@ export class UIController {
   private readonly renderer: Renderer;
   private readonly stage: Stage;
 
-  private readonly polygonLayer = new Layer('PolygonLayer');
+  private readonly polygonLayer: Layer;
 
   private mousePositionTransformer: MousePositionTransformer;
   private applicationUIContainer: HTMLElement;
@@ -40,13 +42,12 @@ export class UIController {
   }
 
   public init() {
-    const applicationUIContainer = document.getElementById('application-ui');
+    const applicationUIContainer = document.getElementById(configuration.applicationUIContainerID);
     if (!applicationUIContainer) {
       throw new Error('Application UI container not found');
     }
 
     this.applicationUIContainer = applicationUIContainer;
-    this.stage.layers.push(this.polygonLayer);
 
     this.mousePositionTransformer = new MousePositionTransformer(this.canvas);
 
@@ -55,7 +56,7 @@ export class UIController {
       applicationUIContainer: this.applicationUIContainer,
       canvas: this.canvas,
       stage: this.stage,
-      polygonLayer: this.polygonLayer,
+      polygonLayer: this.stage.findLayerByName(LEX.POLYGON_LAYER_NAME),
       renderer: this.renderer,
       mousePositionTransformer: this.mousePositionTransformer
     });
@@ -67,8 +68,6 @@ export class UIController {
   public destroy() {
     this.canvas.removeEventListener('click', this.onClick);
     this.newPolygonUIController.destroy();
-
-    this.stage.removeLayer(this.polygonLayer);
   }
 
   private onClick(event: MouseEvent) {

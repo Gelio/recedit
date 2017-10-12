@@ -1,6 +1,7 @@
 import { LineProperties } from 'common/LineProperties';
 import { Path } from 'common/Path';
 import { Point } from 'common/Point';
+import { configuration } from 'configuration';
 
 export class Polygon extends Path {
   constructor(path: Path);
@@ -24,10 +25,10 @@ export class Polygon extends Path {
   }
 
   private static ensureVerticesLength(vertices: Point[]) {
-    if (vertices.length >= 3) {
+    if (vertices.length >= configuration.minPolygonPoints) {
       return;
     }
 
-    throw new Error('Polygon must have at least 3 vertices');
+    throw new Error(`Polygon must have at least ${configuration.minPolygonPoints} vertices`);
   }
 }
