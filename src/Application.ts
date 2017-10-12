@@ -12,7 +12,7 @@ export class Application {
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.renderer = new Renderer(this.canvas, { lineRasterizer: new LineRasterizer() });
-    this.stage = new Stage(this.canvas);
+    this.stage = new Stage();
     this.uiController = new UIController(this.canvas, { application: this, renderer: this.renderer, stage: this.stage });
   }
 
@@ -22,6 +22,6 @@ export class Application {
 
   public render() {
     this.renderer.clear();
-    this.stage.polygons.forEach(polygon => this.renderer.drawPolygon(polygon));
+    this.stage.render(this.renderer);
   }
 }
