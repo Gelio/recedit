@@ -71,7 +71,6 @@ export class UIController {
 
     switch (this.currentState) {
       case UIStates.InitialPolygon:
-        console.log('Adding a new point', point);
         this.addNewPoint(point);
         break;
 
@@ -86,6 +85,9 @@ export class UIController {
 
   private addNewPoint(point: Point) {
     let pointHandled = false;
+
+    const hitTestResult = this.stage.hitTest(point);
+    console.log('Hit test result', hitTestResult);
 
     if (this.unfinishedPath.getVerticesCount() >= 3) {
       const distanceToFirstPoint = Point.getDistanceBetween(point, this.unfinishedPath.getStartingPoint());
