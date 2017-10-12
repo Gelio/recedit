@@ -3,6 +3,7 @@ import { Point } from 'common/Point';
 
 import 'ui/components/PathPointComponent.scss';
 
+const COMPONENT_CLASS_NAME = 'application-ui__vertex';
 const ENABLED_CLASS_NAME = 'enabled';
 const INITIAL_CLASS_NAME = 'application-ui__vertex--initial';
 
@@ -33,38 +34,30 @@ export class PathPointComponent {
   }
 
   public set enabled(enable: boolean) {
-    const enabled = this.enabled;
-
-    if (enable && enabled) {
-      return;
-    } else if (!enable && !enabled) {
-      return;
-    }
-
-    this.element.classList.toggle(ENABLED_CLASS_NAME);
+    this.addOrRemoveElementClass(ENABLED_CLASS_NAME, enable);
   }
 
   public get initial() {
     return this.element.classList.contains(INITIAL_CLASS_NAME);
   }
 
-  public set initial(initial: boolean) {
-    const isCurrentlyInitial = this.initial;
+  public set initial(isInitial: boolean) {
+    this.addOrRemoveElementClass(INITIAL_CLASS_NAME, isInitial);
+  }
 
-    if (initial && isCurrentlyInitial) {
-      return;
-    } else if (!initial && !isCurrentlyInitial) {
-      return;
+  private addOrRemoveElementClass(className: string, value: boolean) {
+    if (value) {
+      this.element.classList.add(className);
+    } else {
+      this.element.classList.remove(className);
     }
-
-    this.element.classList.toggle(INITIAL_CLASS_NAME);
   }
 
   private init() {
     this.element = document.createElement('div');
     this.container.appendChild(this.element);
 
-    this.element.classList.add('application-ui__vertex');
+    this.element.classList.add(COMPONENT_CLASS_NAME);
     this.updatePosition();
 
     this.element.addEventListener('click', () => {
