@@ -4,6 +4,7 @@ import { Path } from 'common/Path';
 import { Point } from 'common/Point';
 import { Polygon } from 'common/Polygon';
 import { configuration } from 'configuration';
+import { LEX } from 'LEX';
 import { Renderer } from 'Renderer';
 import { Stage } from 'Stage';
 import { PathPointComponent } from 'ui/components/PathPointComponent';
@@ -29,7 +30,7 @@ export class NewPolygonUIController {
 
   private unfinishedPath: Path;
   private startingPathPointComponent: PathPointComponent;
-  private readonly pathLayer = new Layer('PathLayer');
+  private readonly pathLayer = new Layer(LEX.PATH_LAYER_NAME);
   private readonly polygonLayer: Layer;
 
   constructor(dependencies: NewPolygonUIControllerDependencies) {
