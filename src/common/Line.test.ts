@@ -37,4 +37,33 @@ describe('Line', () => {
       expect(line.distanceToPoint(p)).toBeGreaterThan(50);
     });
   });
+
+  describe('equals', () => {
+    it('should return true when points equal', () => {
+      const p1 = new Point(0, 5);
+      const p2 = new Point(0, 10);
+      const line1 = new Line(p1, p2);
+      const line2 = new Line(p1, p2);
+
+      expect(line1.equals(line2)).toBe(true);
+    });
+
+    it('should return true when points are reversed', () => {
+      const p1 = new Point(0, 5);
+      const p2 = new Point(0, 10);
+      const line1 = new Line(p1, p2);
+      const line2 = new Line(p2, p1);
+
+      expect(line1.equals(line2)).toBe(true);
+    });
+
+    it('should return false when points are different', () => {
+      const p1 = new Point(0, 5);
+      const p2 = new Point(0, 10);
+      const line1 = new Line(p1, p2);
+      const line2 = new Line(p2, new Point(0, 40));
+
+      expect(line1.equals(line2)).toBe(false);
+    });
+  });
 });
