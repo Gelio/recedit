@@ -11,6 +11,7 @@ export class Path {
   public readonly vertices: Point[];
   public lineProperties: LineProperties;
   public readonly conditions: Condition[] = [];
+  public readonly lockedVertices = new Set<Point>();
 
   constructor(vertices: Point[], lineProperties: LineProperties) {
     this.vertices = vertices;

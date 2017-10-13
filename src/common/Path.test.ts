@@ -8,7 +8,8 @@ import { Condition } from 'conditions/Condition';
 
 function createMockCondition(isMet: boolean): Condition {
   return {
-    isMet: () => isMet
+    isMet: () => isMet,
+    fix: () => isMet = true
   };
 }
 
