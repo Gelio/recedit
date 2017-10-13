@@ -12,7 +12,7 @@ export class Polygon extends Path {
 
     if (pathOrVertices instanceof Path) {
       const path = pathOrVertices;
-      vertices = path.vertices;
+      vertices = path.getVertices();
       lineProperties = path.lineProperties;
     } else {
       vertices = pathOrVertices;
@@ -30,5 +30,9 @@ export class Polygon extends Path {
     }
 
     throw new Error(`Polygon must have at least ${configuration.minPolygonPoints} vertices`);
+  }
+
+  public clone(): Polygon {
+    return new Polygon(super.clone());
   }
 }
