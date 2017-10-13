@@ -1,14 +1,14 @@
 import { LineCondition } from 'conditions/LineCondition';
 
 import { Line } from 'common/Line';
-import { Path } from 'common/Path';
 import { Point } from 'common/Point';
+import { Polygon } from 'common/Polygon';
 
 export class FixedLengthLineCondition extends LineCondition {
   private readonly fixedLengthSquared: number;
 
-  constructor(line: Line, path: Path, length: number) {
-    super(line, path);
+  constructor(line: Line, polygon: Polygon, length: number) {
+    super(line, polygon);
 
     this.fixedLengthSquared = Math.pow(length, 2);
   }

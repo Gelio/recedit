@@ -2,23 +2,24 @@ import { FixedLengthLineCondition } from 'conditions/FixedLengthLineCondition';
 
 import { Line } from 'common/Line';
 import { LineProperties } from 'common/LineProperties';
-import { Path } from 'common/Path';
 import { Point } from 'common/Point';
+import { Polygon } from 'common/Polygon';
 
 describe('FixedLengthLineCondition', () => {
-  let path: Path;
+  let polygon: Polygon;
 
   beforeEach(() => {
-    path = new Path([], LineProperties.getDefault());
+    polygon = new Polygon([], LineProperties.getDefault());
   });
 
   it('should instantiate without errors', () => {
     const p1 = new Point(1, 2);
     const p2 = new Point(1, 5);
     const line = new Line(p1, p2);
-    path.vertices.push(p1, p2);
+    polygon.addVertex(p1);
+    polygon.addVertex(p2);
 
-    expect(new FixedLengthLineCondition(line, path, 3)).toBeDefined();
+    expect(new FixedLengthLineCondition(line, polygon, 3)).toBeDefined();
   });
 
   describe('itMet', () => {
@@ -26,9 +27,10 @@ describe('FixedLengthLineCondition', () => {
       const p1 = new Point(1, 2);
       const p2 = new Point(1, 5);
       const line = new Line(p1, p2);
-      path.vertices.push(p1, p2);
+      polygon.addVertex(p1);
+      polygon.addVertex(p2);
 
-      const condition = new FixedLengthLineCondition(line, path, 3);
+      const condition = new FixedLengthLineCondition(line, polygon, 3);
 
       expect(condition.isMet()).toBe(true);
     });
@@ -37,9 +39,10 @@ describe('FixedLengthLineCondition', () => {
       const p1 = new Point(1, 2);
       const p2 = new Point(1, 8);
       const line = new Line(p1, p2);
-      path.vertices.push(p1, p2);
+      polygon.addVertex(p1);
+      polygon.addVertex(p2);
 
-      const condition = new FixedLengthLineCondition(line, path, 3);
+      const condition = new FixedLengthLineCondition(line, polygon, 3);
 
       expect(condition.isMet()).toBe(false);
     });

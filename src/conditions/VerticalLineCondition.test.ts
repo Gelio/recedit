@@ -2,23 +2,24 @@ import { VerticalLineCondition } from 'conditions/VerticalLineCondition';
 
 import { Line } from 'common/Line';
 import { LineProperties } from 'common/LineProperties';
-import { Path } from 'common/Path';
 import { Point } from 'common/Point';
+import { Polygon } from 'common/Polygon';
 
 describe('VerticalLineCondition', () => {
-  let path: Path;
+  let polygon: Polygon;
 
   beforeEach(() => {
-    path = new Path([], LineProperties.getDefault());
+    polygon = new Polygon([], LineProperties.getDefault());
   });
 
   it('should instantiate without errors', () => {
     const p1 = new Point(1, 2);
     const p2 = new Point(1, 5);
     const line = new Line(p1, p2);
-    path.vertices.push(p1, p2);
+    polygon.addVertex(p1);
+    polygon.addVertex(p2);
 
-    expect(new VerticalLineCondition(line, path)).toBeDefined();
+    expect(new VerticalLineCondition(line, polygon)).toBeDefined();
   });
 
   describe('itMet', () => {
@@ -26,9 +27,10 @@ describe('VerticalLineCondition', () => {
       const p1 = new Point(5, 2);
       const p2 = new Point(5, 1);
       const line = new Line(p1, p2);
-      path.vertices.push(p1, p2);
+      polygon.addVertex(p1);
+      polygon.addVertex(p2);
 
-      const condition = new VerticalLineCondition(line, path);
+      const condition = new VerticalLineCondition(line, polygon);
 
       expect(condition.isMet()).toBe(true);
     });
@@ -37,9 +39,10 @@ describe('VerticalLineCondition', () => {
       const p1 = new Point(0, 2);
       const p2 = new Point(5, 8);
       const line = new Line(p1, p2);
-      path.vertices.push(p1, p2);
+      polygon.addVertex(p1);
+      polygon.addVertex(p2);
 
-      const condition = new VerticalLineCondition(line, path);
+      const condition = new VerticalLineCondition(line, polygon);
 
       expect(condition.isMet()).toBe(false);
     });
