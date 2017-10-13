@@ -1,15 +1,8 @@
 import { Application } from 'Application';
-import { COLORS } from 'common/COLORS';
-import { Layer } from 'common/Layer';
-import { LineProperties } from 'common/LineProperties';
-import { Path } from 'common/Path';
-import { Point } from 'common/Point';
-import { Polygon } from 'common/Polygon';
 import { configuration } from 'configuration';
 import { LEX } from 'LEX';
 import { Renderer } from 'Renderer';
 import { Stage } from 'Stage';
-import { PathPointComponent } from 'ui/components/PathPointComponent';
 import { MousePositionTransformer } from 'ui/MousePositionTransformer';
 import { NewPolygonUIController } from 'ui/NewPolygonUIController';
 
@@ -25,8 +18,6 @@ export class UIController {
   private readonly application: Application;
   private readonly renderer: Renderer;
   private readonly stage: Stage;
-
-  private readonly polygonLayer: Layer;
 
   private mousePositionTransformer: MousePositionTransformer;
   private applicationUIContainer: HTMLElement;

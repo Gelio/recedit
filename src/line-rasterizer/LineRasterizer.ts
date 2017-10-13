@@ -1,4 +1,3 @@
-import { Octant } from 'common/Octant';
 import { Point } from 'common/Point';
 import { octantVectorTransformations, reverseOctantVectorTransformations } from 'line-rasterizer/octant-vector-transformations';
 
