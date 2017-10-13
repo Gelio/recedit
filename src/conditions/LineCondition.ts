@@ -1,15 +1,13 @@
-import { Condition } from 'conditions/Condition';
-
 import { Line } from 'common/Line';
-import { Path } from 'common/Path';
+import { Polygon } from 'common/Polygon';
 
-export class LineCondition implements Condition {
-  protected readonly line: Line;
-  protected readonly path: Path;
+export class LineCondition {
+  public readonly line: Line;
+  public readonly polygon: Polygon;
 
-  constructor(line: Line, path: Path) {
+  constructor(line: Line, polygon: Polygon) {
     this.line = line;
-    this.path = path;
+    this.polygon = polygon;
   }
 
   public isMet(): boolean {
