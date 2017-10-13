@@ -16,8 +16,6 @@ export class Renderer {
   private renderingContext: CanvasRenderingContext2D;
   private lineRasterizer: LineRasterizer;
 
-  private fillColor: Color;
-
   constructor(dependencies: RendererDependencies) {
     this.canvas = dependencies.canvas;
     const context = this.canvas.getContext('2d');
