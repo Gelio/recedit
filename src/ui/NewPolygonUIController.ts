@@ -59,7 +59,7 @@ export class NewPolygonUIController {
   }
 
   public addNewPoint(point: Point) {
-    this.unfinishedPath.vertices.push(point);
+    this.unfinishedPath.addVertex(point);
     const pathPointComponent = new PathPointComponent(
       this.applicationUIContainer,
       this.unfinishedPath,
@@ -67,7 +67,7 @@ export class NewPolygonUIController {
     );
     pathPointComponent.enabled = true;
 
-    if (this.unfinishedPath.vertices.length === 1) {
+    if (this.unfinishedPath.getVerticesCount() === 1) {
       this.startingPathPointComponent = pathPointComponent;
       pathPointComponent.element.addEventListener('click', this.closePath);
       pathPointComponent.initial = true;
@@ -82,7 +82,7 @@ export class NewPolygonUIController {
       return;
     }
 
-    const lastPoint = this.unfinishedPath.vertices[unfinishedPathVerticesCount - 1];
+    const lastPoint = this.unfinishedPath.getVertex(unfinishedPathVerticesCount - 1);
     this.application.render();
 
     const point = this.mousePositionTransformer.getPointFromMouseEvent(event);
@@ -99,9 +99,8 @@ export class NewPolygonUIController {
       return alert(`Polygon must have at least ${configuration.minPolygonPoints} vertices`);
     }
 
-    this.polygonLayer.paths.push(
-      new Polygon(this.unfinishedPath.vertices, configuration.polygonLineProperties)
-    );
+    this.unfinishedPath.lineProperties = configuration.polygonLineProperties;
+    this.polygonLayer.paths.push(new Polygon(this.unfinishedPath));
 
     this.pathLayer.removePath(this.unfinishedPath);
     this.startingPathPointComponent.element.removeEventListener('click', this.closePath);
