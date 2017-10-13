@@ -4,14 +4,10 @@ import { LineProperties } from 'common/LineProperties';
 import { Point } from 'common/Point';
 import { configuration } from 'configuration';
 
-import { Condition } from 'conditions/Condition';
-
 export class Path {
   public closed: boolean = false;
-  public readonly vertices: Point[];
   public lineProperties: LineProperties;
-  public readonly conditions: Condition[] = [];
-  public readonly lockedVertices = new Set<Point>();
+  protected readonly vertices: Point[];
 
   constructor(vertices: Point[], lineProperties: LineProperties) {
     this.vertices = vertices;
@@ -65,7 +61,39 @@ export class Path {
     return null;
   }
 
-  public areConditionsMet() {
-    return this.conditions.every(condition => condition.isMet());
+  public getVertex(index: number): Point {
+    return this.vertices[index];
+  }
+
+  public getVertices(): Point[] {
+    return [...this.vertices];
+  }
+
+  public addVertex(point: Point) {
+    this.vertices.push(point);
+  }
+
+  public removeVertex(point: Point) {
+    const index = this.vertices.findIndex(otherPoint => otherPoint.equals(point));
+
+    if (index !== -1) {
+      this.vertices.splice(index, 1);
+    }
+  }
+
+  public insertVertex(point: Point, index: number) {
+    this.vertices.splice(index, 0, point);
+  }
+
+  public movePoint(point: Point, newPosition: Point) {
+    point.x = newPosition.x;
+    point.y = newPosition.y;
+  }
+
+  public clone(): Path {
+    const vertices = this.getVertices();
+    const lineProperties = this.lineProperties.clone();
+
+    return new Path(vertices, lineProperties);
   }
 }

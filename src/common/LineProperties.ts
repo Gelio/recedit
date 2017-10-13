@@ -13,4 +13,8 @@ export class LineProperties {
   public static getDefault(): LineProperties {
     return new LineProperties(COLORS.BLACK, 1);
   }
+
+  public clone(): LineProperties {
+    return new LineProperties(this.color, this.thickness);
+  }
 }

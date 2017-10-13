@@ -4,15 +4,6 @@ import { LineProperties } from 'common/LineProperties';
 import { Path } from 'common/Path';
 import { Point } from 'common/Point';
 
-import { Condition } from 'conditions/Condition';
-
-function createMockCondition(isMet: boolean): Condition {
-  return {
-    isMet: () => isMet,
-    fix: () => isMet = true
-  };
-}
-
 describe('Path', () => {
   let path: Path;
 
@@ -29,7 +20,7 @@ describe('Path', () => {
 
     it('should iterate over all vertices', () => {
       const points = [new Point(1, 2), new Point(3, 4), new Point(5, 6)];
-      path.vertices.push(...points);
+      points.forEach(point => path.addVertex(point));
 
       const iteratedPoints: Point[] = [];
 
@@ -42,7 +33,7 @@ describe('Path', () => {
 
     it('should include first point twice when path is closed', () => {
       const points = [new Point(1, 2), new Point(3, 4), new Point(5, 6)];
-      path.vertices.push(...points);
+      points.forEach(point => path.addVertex(point));
       path.closed = true;
 
       const iteratedPoints: Point[] = [];
@@ -64,7 +55,7 @@ describe('Path', () => {
 
     it('should iterate over all edges', () => {
       const points = [new Point(1, 2), new Point(3, 4), new Point(5, 6)];
-      path.vertices.push(...points);
+      points.forEach(point => path.addVertex(point));
 
       const iteratedLines: Line[] = [];
 
@@ -77,7 +68,7 @@ describe('Path', () => {
 
     it('should include extra edge when path is closed', () => {
       const points = [new Point(1, 2), new Point(3, 4), new Point(5, 6)];
-      path.vertices.push(...points);
+      points.forEach(point => path.addVertex(point));
       path.closed = true;
 
       const iteratedLines: Line[] = [];
@@ -93,7 +84,7 @@ describe('Path', () => {
   describe('hitTest', () => {
     beforeEach(() => {
       const points = [new Point(0, 0), new Point(50, 0), new Point(50, 50)];
-      path.vertices.push(...points);
+      points.forEach(point => path.addVertex(point));
     });
 
     it('should return null when point was far away', () => {
@@ -143,24 +134,6 @@ describe('Path', () => {
       const expectedLine = new Line(new Point(0, 0), new Point(50, 0));
 
       expect(result.line.equals(expectedLine)).toBe(true);
-    });
-  });
-
-  describe('areConditionsMet', () => {
-    it('should return true when there are no conditions', () => {
-      expect(path.areConditionsMet()).toBe(true);
-    });
-
-    it('should return true when all conditions are met', () => {
-      path.conditions.push(createMockCondition(true), createMockCondition(true), createMockCondition(true));
-
-      expect(path.areConditionsMet()).toBe(true);
-    });
-
-    it('should return false when a condition is not met', () => {
-      path.conditions.push(createMockCondition(true), createMockCondition(false));
-
-      expect(path.areConditionsMet()).toBe(false);
     });
   });
 });
