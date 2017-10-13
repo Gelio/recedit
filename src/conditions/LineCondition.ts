@@ -13,6 +13,10 @@ export class LineCondition implements Condition {
   }
 
   public isMet(): boolean {
-    throw new Error('LineCondition not implemented');
+    throw new Error('LineCondition.isMet not implemented');
+  }
+
+  public fix() {
+    throw new Error('LineCondition.fix not implemented');
   }
 }
