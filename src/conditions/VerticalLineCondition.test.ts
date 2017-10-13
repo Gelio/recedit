@@ -9,7 +9,8 @@ describe('VerticalLineCondition', () => {
   let polygon: Polygon;
 
   beforeEach(() => {
-    polygon = new Polygon([], LineProperties.getDefault());
+    const points = [new Point(-10, -10), new Point(-15, -15), new Point(0, 0)];
+    polygon = new Polygon(points, LineProperties.getDefault());
   });
 
   it('should instantiate without errors', () => {
