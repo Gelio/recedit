@@ -63,7 +63,11 @@ export class NewPolygonUIController {
     const pathPointComponent = new PathPointComponent(
       this.applicationUIContainer,
       this.unfinishedPath,
-      point
+      point,
+      {
+        mousePositionTransformer: this.mousePositionTransformer,
+        application: this.application
+      }
     );
     pathPointComponent.enabled = true;
 
