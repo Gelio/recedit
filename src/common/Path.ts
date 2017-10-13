@@ -4,10 +4,13 @@ import { LineProperties } from 'common/LineProperties';
 import { Point } from 'common/Point';
 import { configuration } from 'configuration';
 
+import { Condition } from 'conditions/Condition';
+
 export class Path {
   public closed: boolean = false;
-  public vertices: Point[];
+  public readonly vertices: Point[];
   public lineProperties: LineProperties;
+  public readonly conditions: Condition[] = [];
 
   constructor(vertices: Point[], lineProperties: LineProperties) {
     this.vertices = vertices;
@@ -59,5 +62,9 @@ export class Path {
     }
 
     return null;
+  }
+
+  public areConditionsMet() {
+    return this.conditions.every(condition => condition.isMet());
   }
 }
