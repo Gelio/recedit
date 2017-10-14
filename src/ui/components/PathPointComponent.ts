@@ -2,6 +2,7 @@ import { Path } from 'common/Path';
 import { Point } from 'common/Point';
 
 import { Application } from 'Application';
+import { configuration } from 'configuration';
 import { MousePositionTransformer } from 'ui/MousePositionTransformer';
 
 import 'ui/components/PathPointComponent.scss';
@@ -23,6 +24,8 @@ export class PathPointComponent {
   private readonly mousePositionTransformer: MousePositionTransformer;
   private readonly application: Application;
 
+  private previousClickTimestamp: number = 0;
+
   constructor(container: HTMLElement, path: Path, point: Point, dependencies: PathPointComponentDependencies) {
     this.container = container;
     this.path = path;
@@ -37,6 +40,7 @@ export class PathPointComponent {
   }
 
   public remove() {
+    this.element.removeEventListener('mousedown', this.onMouseDown);
     this.element.remove();
   }
 
@@ -83,6 +87,23 @@ export class PathPointComponent {
     if (this.initial) {
       return;
     }
+
+    const currentTimestamp = Date.now();
+
+    if (currentTimestamp - this.previousClickTimestamp <= configuration.doubleClickMaxDelay) {
+      try {
+        this.path.removeVertex(this.point);
+      } catch (error) {
+        alert('Cannot remove vertex');
+
+        return;
+      }
+      this.remove();
+      this.application.render();
+
+      return;
+    }
+    this.previousClickTimestamp = currentTimestamp;
 
     window.addEventListener('mousemove', this.onMouseMove);
     window.addEventListener('mouseup', this.stopMoving);

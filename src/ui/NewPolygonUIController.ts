@@ -21,6 +21,7 @@ interface NewPolygonUIControllerDependencies {
 }
 
 export class NewPolygonUIController {
+  public pathPointComponents: PathPointComponent[] = [];
   private readonly application: Application;
   private readonly applicationUIContainer: HTMLElement;
   private readonly canvas: HTMLCanvasElement;
@@ -71,6 +72,8 @@ export class NewPolygonUIController {
     );
     pathPointComponent.enabled = true;
 
+    this.pathPointComponents.push(pathPointComponent);
+
     if (this.unfinishedPath.getVerticesCount() === 1) {
       this.startingPathPointComponent = pathPointComponent;
       pathPointComponent.element.addEventListener('click', this.closePath);
@@ -107,6 +110,10 @@ export class NewPolygonUIController {
     const polygon = new Polygon(this.unfinishedPath);
     this.startingPathPointComponent.path = polygon;
     this.polygonLayer.paths.push(polygon);
+
+    this.pathPointComponents
+      .filter(component => component.path === this.unfinishedPath)
+      .forEach(component => (component.path = polygon));
 
     this.pathLayer.removePath(this.unfinishedPath);
     this.startingPathPointComponent.element.removeEventListener('click', this.closePath);

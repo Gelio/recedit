@@ -7,7 +7,8 @@ const configuration = {
   polygonLineProperties: LineProperties.getDefault(),
   applicationUIContainerID: 'application-ui',
   hitTolerance: 10,
-  minPolygonPoints: 3
+  minPolygonPoints: 3,
+  doubleClickMaxDelay: 500
 };
 
 export {

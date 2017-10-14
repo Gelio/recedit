@@ -31,4 +31,8 @@ export class Line {
       (this.p1.equals(line.p2) && this.p2.equals(line.p1))
     );
   }
+
+  public getMiddlePoint(): Point {
+    return new Point((this.p1.x + this.p2.x) / 2, (this.p1.y + this.p2.y) / 2);
+  }
 }

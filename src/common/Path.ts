@@ -100,7 +100,7 @@ export class Path {
     return new Path(vertices, lineProperties);
   }
 
-  private findPointIndex(point: Point) {
+  public findPointIndex(point: Point) {
     return this.vertices.findIndex(otherPoint => otherPoint.equals(point));
   }
 }

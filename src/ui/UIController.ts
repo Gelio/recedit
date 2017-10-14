@@ -1,8 +1,10 @@
 import { Application } from 'Application';
+import { HitTestResult } from 'common/HitTestResult';
 import { configuration } from 'configuration';
 import { LEX } from 'LEX';
 import { Renderer } from 'Renderer';
 import { Stage } from 'Stage';
+import { PathPointComponent } from 'ui/components/PathPointComponent';
 import { MousePositionTransformer } from 'ui/MousePositionTransformer';
 import { NewPolygonUIController } from 'ui/NewPolygonUIController';
 
@@ -22,6 +24,8 @@ export class UIController {
   private mousePositionTransformer: MousePositionTransformer;
   private applicationUIContainer: HTMLElement;
   private newPolygonUIController: NewPolygonUIController;
+  private previousHitTestResult: HitTestResult | null = null;
+  private previousHitTestTimestamp: number = 0;
 
   constructor(dependencies: UIControllerDependencies) {
     this.canvas = dependencies.canvas;
@@ -65,11 +69,44 @@ export class UIController {
     const point = this.mousePositionTransformer.getPointFromMouseEvent(event);
 
     const hitTestResult = this.stage.hitTest(point);
+    const previousHitTestResult = this.previousHitTestResult;
+    const previousHitTestTimestamp = this.previousHitTestTimestamp;
+    this.previousHitTestResult = hitTestResult;
+    this.previousHitTestTimestamp = Date.now();
 
     if (!hitTestResult) {
       return this.newPolygonUIController.addNewPoint(point);
     }
 
     console.log('Hit test result', hitTestResult);
+
+    if (
+      !previousHitTestResult ||
+      Date.now() - previousHitTestTimestamp > configuration.doubleClickMaxDelay
+    ) {
+      return;
+    }
+
+    if (previousHitTestResult.line.equals(hitTestResult.line)) {
+      if (!hitTestResult.path) {
+        return;
+      }
+
+      const index = hitTestResult.path.findPointIndex(hitTestResult.line.p2);
+      const newPoint = hitTestResult.line.getMiddlePoint();
+
+      hitTestResult.path.insertVertex(newPoint, index);
+      this.application.render();
+
+      const pathPointComponent = new PathPointComponent(
+        this.applicationUIContainer,
+        hitTestResult.path,
+        newPoint,
+        { application: this.application, mousePositionTransformer: this.mousePositionTransformer }
+      );
+      pathPointComponent.enabled = true;
+
+      this.newPolygonUIController.pathPointComponents.push(pathPointComponent);
+    }
   }
 }
