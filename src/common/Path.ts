@@ -66,7 +66,7 @@ export class Path {
   }
 
   public getVertices(): Point[] {
-    return [...this.vertices];
+    return this.vertices;
   }
 
   public addVertex(point: Point) {
@@ -74,7 +74,7 @@ export class Path {
   }
 
   public removeVertex(point: Point) {
-    const index = this.vertices.findIndex(otherPoint => otherPoint.equals(point));
+    const index = this.findPointIndex(point);
 
     if (index !== -1) {
       this.vertices.splice(index, 1);
@@ -86,8 +86,11 @@ export class Path {
   }
 
   public movePoint(point: Point, newPosition: Point) {
-    point.x = newPosition.x;
-    point.y = newPosition.y;
+    const index = this.findPointIndex(point);
+
+    if (index !== -1) {
+      this.vertices.splice(index, 1, newPosition);
+    }
   }
 
   public clone(): Path {
@@ -95,5 +98,9 @@ export class Path {
     const lineProperties = this.lineProperties.clone();
 
     return new Path(vertices, lineProperties);
+  }
+
+  private findPointIndex(point: Point) {
+    return this.vertices.findIndex(otherPoint => otherPoint.equals(point));
   }
 }

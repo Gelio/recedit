@@ -17,8 +17,8 @@ interface PathPointComponentDependencies {
 
 export class PathPointComponent {
   public element: HTMLDivElement;
+  public path: Path;
   private container: HTMLElement;
-  private path: Path;
   private point: Point;
   private readonly mousePositionTransformer: MousePositionTransformer;
   private readonly application: Application;
@@ -91,6 +91,7 @@ export class PathPointComponent {
   private onMouseMove(event: MouseEvent) {
     const mousePosition = this.mousePositionTransformer.getPointFromMouseEvent(event);
     this.path.movePoint(this.point, mousePosition);
+    this.point = mousePosition;
     this.updatePosition();
     this.application.render();
   }

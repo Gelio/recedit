@@ -104,7 +104,9 @@ export class NewPolygonUIController {
     }
 
     this.unfinishedPath.lineProperties = configuration.polygonLineProperties;
-    this.polygonLayer.paths.push(new Polygon(this.unfinishedPath));
+    const polygon = new Polygon(this.unfinishedPath);
+    this.startingPathPointComponent.path = polygon;
+    this.polygonLayer.paths.push(polygon);
 
     this.pathLayer.removePath(this.unfinishedPath);
     this.startingPathPointComponent.element.removeEventListener('click', this.closePath);
