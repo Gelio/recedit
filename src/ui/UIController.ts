@@ -66,7 +66,8 @@ export class UIController {
     this.pointRemoverService.init();
 
     this.pointDraggingService = new PointDraggingService({
-      eventAggregator: this.eventAggregator
+      eventAggregator: this.eventAggregator,
+      stage: this.stage
     });
     this.pointDraggingService.init();
 
