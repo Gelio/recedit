@@ -82,10 +82,16 @@ export class NewPolygonUIController {
 
   private onPointClick(event: PointClickEvent) {
     const pathPointComponent = event.payload;
+
     if (pathPointComponent.path === this.unfinishedPath && pathPointComponent.initial) {
-      pathPointComponent.initial = false;
-      this.closePath();
       event.handled = true;
+
+      try {
+        this.closePath();
+        pathPointComponent.initial = false;
+      } catch (error) {
+        alert(error.message);
+      }
     }
   }
 
@@ -96,7 +102,7 @@ export class NewPolygonUIController {
 
   private closePath() {
     if (this.unfinishedPath.getVerticesCount() < configuration.minPolygonPoints) {
-      return alert(`Polygon must have at least ${configuration.minPolygonPoints} vertices`);
+      throw new Error(`Polygon must have at least ${configuration.minPolygonPoints} vertices`);
     }
 
     this.unfinishedPath.lineProperties = configuration.polygonLineProperties;
