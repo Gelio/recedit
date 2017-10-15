@@ -1,4 +1,3 @@
-import { Application } from 'Application';
 import { Path } from 'common/Path';
 import { Point } from 'common/Point';
 import { Stage } from 'Stage';
@@ -6,11 +5,13 @@ import { Stage } from 'Stage';
 import { PathPointComponent } from 'ui/components/PathPointComponent';
 import { MousePositionTransformer } from 'ui/MousePositionTransformer';
 
+import { EventAggregator } from 'events/EventAggregator';
+
 interface PointSyncServiceDependencies {
   stage: Stage;
   container: HTMLElement;
-  application: Application;
   mousePositionTransformer: MousePositionTransformer;
+  eventAggregator: EventAggregator;
 }
 
 interface PathPoint {
@@ -22,14 +23,14 @@ export class PointSyncService {
   private readonly stage: Stage;
   private pathPointComponents: PathPointComponent[] = [];
   private readonly container: HTMLElement;
-  private readonly application: Application;
   private readonly mousePositionTransformer: MousePositionTransformer;
+  private readonly eventAggregator: EventAggregator;
 
   constructor(dependencies: PointSyncServiceDependencies) {
     this.stage = dependencies.stage;
     this.container = dependencies.container;
-    this.application = dependencies.application;
     this.mousePositionTransformer = dependencies.mousePositionTransformer;
+    this.eventAggregator = dependencies.eventAggregator;
   }
 
   public synchronizeComponents() {
@@ -69,7 +70,7 @@ export class PointSyncService {
     return pathPoints.map(
       pathPoint =>
         new PathPointComponent(this.container, pathPoint.path, pathPoint.point, {
-          application: this.application,
+          eventAggregator: this.eventAggregator,
           mousePositionTransformer: this.mousePositionTransformer
         })
     );
