@@ -1,14 +1,16 @@
 import { HitTestResult } from 'common/HitTestResult';
 import { configuration } from 'configuration';
-import { EventAggregator } from 'events/EventAggregator';
 import { LEX } from 'LEX';
 import { Renderer } from 'Renderer';
 import { Stage } from 'Stage';
+
 import { MousePositionTransformer } from 'ui/MousePositionTransformer';
 import { NewPolygonUIController } from 'ui/NewPolygonUIController';
+import { PointDraggingService } from 'ui/PointDraggingService';
 import { PointRemoverService } from 'ui/PointRemoverService';
 import { PointSyncService } from 'ui/PointSyncService';
 
+import { EventAggregator } from 'events/EventAggregator';
 import { RenderEvent } from 'events/RenderEvent';
 
 interface UIControllerDependencies {
@@ -29,6 +31,7 @@ export class UIController {
   private newPolygonUIController: NewPolygonUIController;
   private pointSyncService: PointSyncService;
   private pointRemoverService: PointRemoverService;
+  private pointDraggingService: PointDraggingService;
   private previousHitTestResult: HitTestResult | null = null;
   private previousHitTestTimestamp: number = 0;
 
@@ -62,6 +65,12 @@ export class UIController {
     });
     this.pointRemoverService.init();
 
+    this.pointDraggingService = new PointDraggingService({
+      eventAggregator: this.eventAggregator,
+      stage: this.stage
+    });
+    this.pointDraggingService.init();
+
     this.newPolygonUIController = new NewPolygonUIController({
       applicationUIContainer: this.applicationUIContainer,
       canvas: this.canvas,
@@ -80,6 +89,7 @@ export class UIController {
     this.canvas.removeEventListener('click', this.onClick);
     this.newPolygonUIController.destroy();
     this.pointRemoverService.destroy();
+    this.pointDraggingService.destroy();
   }
 
   public update() {

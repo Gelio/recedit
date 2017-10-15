@@ -8,7 +8,8 @@ const configuration = {
   applicationUIContainerID: 'application-ui',
   hitTolerance: 10,
   minPolygonPoints: 3,
-  doubleClickMaxDelay: 500
+  doubleClickMaxDelay: 500,
+  displayPathGhostWhenDragging: false
 };
 
 export {

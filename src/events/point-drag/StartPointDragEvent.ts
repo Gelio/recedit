@@ -1,9 +1,9 @@
 import { AppEvent } from 'events/AppEvent';
 import { PathPointComponent } from 'ui/components/PathPointComponent';
 
-export class PointClickEvent implements AppEvent {
-  public readonly eventType = PointClickEvent.eventType;
+export class StartPointDragEvent implements AppEvent {
   public readonly payload: PathPointComponent;
+  public readonly eventType = StartPointDragEvent.eventType;
   public handled = false;
 
   constructor(pathPointComponent: PathPointComponent) {
@@ -11,6 +11,6 @@ export class PointClickEvent implements AppEvent {
   }
 
   public static get eventType() {
-    return 'PointClickEvent';
+    return 'StartPointDragEvent';
   }
 }
