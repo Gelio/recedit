@@ -1,9 +1,11 @@
 import { Path } from 'common/Path';
 import { Point } from 'common/Point';
 
-import { Application } from 'Application';
-import { configuration } from 'configuration';
 import { MousePositionTransformer } from 'ui/MousePositionTransformer';
+
+import { EventAggregator } from 'events/EventAggregator';
+import { PointClickEvent } from 'events/PointClickEvent';
+import { RenderEvent } from 'events/RenderEvent';
 
 import 'ui/components/PathPointComponent.scss';
 
@@ -12,7 +14,7 @@ const INITIAL_CLASS_NAME = 'application-ui__vertex--initial';
 
 interface PathPointComponentDependencies {
   mousePositionTransformer: MousePositionTransformer;
-  application: Application;
+  eventAggregator: EventAggregator;
 }
 
 export class PathPointComponent {
@@ -21,20 +23,18 @@ export class PathPointComponent {
   public point: Point;
   private container: HTMLElement;
   private readonly mousePositionTransformer: MousePositionTransformer;
-  private readonly application: Application;
-
-  private previousClickTimestamp: number = 0;
+  private readonly eventAggregator: EventAggregator;
 
   constructor(container: HTMLElement, path: Path, point: Point, dependencies: PathPointComponentDependencies) {
     this.container = container;
     this.path = path;
     this.point = point;
     this.mousePositionTransformer = dependencies.mousePositionTransformer;
-    this.application = dependencies.application;
+    this.eventAggregator = dependencies.eventAggregator;
 
     this.onMouseDown = this.onMouseDown.bind(this);
     this.onMouseMove = this.onMouseMove.bind(this);
-    this.stopMoving = this.stopMoving.bind(this);
+    this.stopDragging = this.stopDragging.bind(this);
     this.init();
   }
 
@@ -53,14 +53,10 @@ export class PathPointComponent {
   }
 
   public set initial(isInitial: boolean) {
-    this.addOrRemoveElementClass(INITIAL_CLASS_NAME, isInitial);
-  }
-
-  private addOrRemoveElementClass(className: string, value: boolean) {
-    if (value) {
-      this.element.classList.add(className);
+    if (isInitial) {
+      this.element.classList.add(INITIAL_CLASS_NAME);
     } else {
-      this.element.classList.remove(className);
+      this.element.classList.remove(INITIAL_CLASS_NAME);
     }
   }
 
@@ -79,41 +75,26 @@ export class PathPointComponent {
   }
 
   private onMouseDown() {
-    if (this.initial) {
+    const event = new PointClickEvent(this);
+    this.eventAggregator.dispatchEvent(event);
+
+    if (event.handled) {
       return;
     }
-
-    const currentTimestamp = Date.now();
-
-    if (currentTimestamp - this.previousClickTimestamp <= configuration.doubleClickMaxDelay) {
-      try {
-        this.path.removeVertex(this.point);
-      } catch (error) {
-        alert('Cannot remove vertex');
-
-        return;
-      }
-      this.remove();
-      this.application.render();
-
-      return;
-    }
-    this.previousClickTimestamp = currentTimestamp;
 
     window.addEventListener('mousemove', this.onMouseMove);
-    window.addEventListener('mouseup', this.stopMoving);
+    window.addEventListener('mouseup', this.stopDragging);
   }
 
   private onMouseMove(event: MouseEvent) {
     const mousePosition = this.mousePositionTransformer.getPointFromMouseEvent(event);
     this.path.movePoint(this.point, mousePosition);
     this.point = mousePosition;
-    this.updatePosition();
-    this.application.render();
+    this.eventAggregator.dispatchEvent(new RenderEvent());
   }
 
-  private stopMoving() {
+  private stopDragging() {
     window.removeEventListener('mousemove', this.onMouseMove);
-    window.removeEventListener('mouseup', this.stopMoving);
+    window.removeEventListener('mouseup', this.stopDragging);
   }
 }

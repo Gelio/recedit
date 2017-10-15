@@ -1,38 +1,42 @@
-import { Application } from 'Application';
 import { HitTestResult } from 'common/HitTestResult';
 import { configuration } from 'configuration';
+import { EventAggregator } from 'events/EventAggregator';
 import { LEX } from 'LEX';
 import { Renderer } from 'Renderer';
 import { Stage } from 'Stage';
 import { MousePositionTransformer } from 'ui/MousePositionTransformer';
 import { NewPolygonUIController } from 'ui/NewPolygonUIController';
+import { PointRemoverService } from 'ui/PointRemoverService';
 import { PointSyncService } from 'ui/PointSyncService';
+
+import { RenderEvent } from 'events/RenderEvent';
 
 interface UIControllerDependencies {
   canvas: HTMLCanvasElement;
-  application: Application;
   renderer: Renderer;
   stage: Stage;
+  eventAggregator: EventAggregator;
 }
 
 export class UIController {
   private readonly canvas: HTMLCanvasElement;
-  private readonly application: Application;
   private readonly renderer: Renderer;
   private readonly stage: Stage;
+  private readonly eventAggregator: EventAggregator;
 
   private mousePositionTransformer: MousePositionTransformer;
   private applicationUIContainer: HTMLElement;
   private newPolygonUIController: NewPolygonUIController;
   private pointSyncService: PointSyncService;
+  private pointRemoverService: PointRemoverService;
   private previousHitTestResult: HitTestResult | null = null;
   private previousHitTestTimestamp: number = 0;
 
   constructor(dependencies: UIControllerDependencies) {
     this.canvas = dependencies.canvas;
-    this.application = dependencies.application;
     this.renderer = dependencies.renderer;
     this.stage = dependencies.stage;
+    this.eventAggregator = dependencies.eventAggregator;
 
     this.onClick = this.onClick.bind(this);
   }
@@ -47,20 +51,25 @@ export class UIController {
 
     this.mousePositionTransformer = new MousePositionTransformer(this.canvas);
     this.pointSyncService = new PointSyncService({
-      application: this.application,
       container: this.applicationUIContainer,
       mousePositionTransformer: this.mousePositionTransformer,
-      stage: this.stage
+      stage: this.stage,
+      eventAggregator: this.eventAggregator
     });
 
+    this.pointRemoverService = new PointRemoverService({
+      eventAggregator: this.eventAggregator
+    });
+    this.pointRemoverService.init();
+
     this.newPolygonUIController = new NewPolygonUIController({
-      application: this.application,
       applicationUIContainer: this.applicationUIContainer,
       canvas: this.canvas,
       stage: this.stage,
       polygonLayer: this.stage.findLayerByName(LEX.POLYGON_LAYER_NAME),
       renderer: this.renderer,
-      mousePositionTransformer: this.mousePositionTransformer
+      mousePositionTransformer: this.mousePositionTransformer,
+      eventAggregator: this.eventAggregator
     });
     this.newPolygonUIController.init();
 
@@ -70,6 +79,7 @@ export class UIController {
   public destroy() {
     this.canvas.removeEventListener('click', this.onClick);
     this.newPolygonUIController.destroy();
+    this.pointRemoverService.destroy();
   }
 
   public update() {
@@ -107,7 +117,7 @@ export class UIController {
       const newPoint = hitTestResult.line.getMiddlePoint();
 
       hitTestResult.path.insertVertex(newPoint, index);
-      this.application.render();
+      this.eventAggregator.dispatchEvent(new RenderEvent());
     }
   }
 }
