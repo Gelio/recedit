@@ -85,6 +85,7 @@ export class NewPolygonUIController {
     if (pathPointComponent.path === this.unfinishedPath && pathPointComponent.initial) {
       pathPointComponent.initial = false;
       this.closePath();
+      event.handled = true;
     }
   }
 
