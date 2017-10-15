@@ -4,9 +4,9 @@ import { configuration } from 'configuration';
 import { LEX } from 'LEX';
 import { Renderer } from 'Renderer';
 import { Stage } from 'Stage';
-import { PathPointComponent } from 'ui/components/PathPointComponent';
 import { MousePositionTransformer } from 'ui/MousePositionTransformer';
 import { NewPolygonUIController } from 'ui/NewPolygonUIController';
+import { PointSyncService } from 'ui/PointSyncService';
 
 interface UIControllerDependencies {
   canvas: HTMLCanvasElement;
@@ -24,6 +24,7 @@ export class UIController {
   private mousePositionTransformer: MousePositionTransformer;
   private applicationUIContainer: HTMLElement;
   private newPolygonUIController: NewPolygonUIController;
+  private pointSyncService: PointSyncService;
   private previousHitTestResult: HitTestResult | null = null;
   private previousHitTestTimestamp: number = 0;
 
@@ -45,6 +46,12 @@ export class UIController {
     this.applicationUIContainer = applicationUIContainer;
 
     this.mousePositionTransformer = new MousePositionTransformer(this.canvas);
+    this.pointSyncService = new PointSyncService({
+      application: this.application,
+      container: this.applicationUIContainer,
+      mousePositionTransformer: this.mousePositionTransformer,
+      stage: this.stage
+    });
 
     this.newPolygonUIController = new NewPolygonUIController({
       application: this.application,
@@ -63,6 +70,10 @@ export class UIController {
   public destroy() {
     this.canvas.removeEventListener('click', this.onClick);
     this.newPolygonUIController.destroy();
+  }
+
+  public update() {
+    this.pointSyncService.synchronizeComponents();
   }
 
   private onClick(event: MouseEvent) {
@@ -97,16 +108,6 @@ export class UIController {
 
       hitTestResult.path.insertVertex(newPoint, index);
       this.application.render();
-
-      const pathPointComponent = new PathPointComponent(
-        this.applicationUIContainer,
-        hitTestResult.path,
-        newPoint,
-        { application: this.application, mousePositionTransformer: this.mousePositionTransformer }
-      );
-      pathPointComponent.enabled = true;
-
-      this.newPolygonUIController.pathPointComponents.push(pathPointComponent);
     }
   }
 }

@@ -8,7 +8,6 @@ import { MousePositionTransformer } from 'ui/MousePositionTransformer';
 import 'ui/components/PathPointComponent.scss';
 
 const COMPONENT_CLASS_NAME = 'application-ui__vertex';
-const ENABLED_CLASS_NAME = 'enabled';
 const INITIAL_CLASS_NAME = 'application-ui__vertex--initial';
 
 interface PathPointComponentDependencies {
@@ -19,8 +18,8 @@ interface PathPointComponentDependencies {
 export class PathPointComponent {
   public element: HTMLDivElement;
   public path: Path;
+  public point: Point;
   private container: HTMLElement;
-  private point: Point;
   private readonly mousePositionTransformer: MousePositionTransformer;
   private readonly application: Application;
 
@@ -49,14 +48,6 @@ export class PathPointComponent {
     this.element.style.left = `${this.point.x}px`;
   }
 
-  public get enabled() {
-    return this.element.classList.contains(ENABLED_CLASS_NAME);
-  }
-
-  public set enabled(enable: boolean) {
-    this.addOrRemoveElementClass(ENABLED_CLASS_NAME, enable);
-  }
-
   public get initial() {
     return this.element.classList.contains(INITIAL_CLASS_NAME);
   }
@@ -79,6 +70,10 @@ export class PathPointComponent {
 
     this.element.classList.add(COMPONENT_CLASS_NAME);
     this.updatePosition();
+
+    if (this.path.getVerticesCount() === 1) {
+      this.initial = true;
+    }
 
     this.element.addEventListener('mousedown', this.onMouseDown);
   }

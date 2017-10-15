@@ -33,5 +33,6 @@ export class Application {
   public render() {
     this.renderer.clear();
     this.stage.render(this.renderer);
+    this.uiController.update();
   }
 }

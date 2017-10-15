@@ -7,7 +7,6 @@ import { configuration } from 'configuration';
 import { LEX } from 'LEX';
 import { Renderer } from 'Renderer';
 import { Stage } from 'Stage';
-import { PathPointComponent } from 'ui/components/PathPointComponent';
 import { MousePositionTransformer } from 'ui/MousePositionTransformer';
 
 interface NewPolygonUIControllerDependencies {
@@ -21,7 +20,6 @@ interface NewPolygonUIControllerDependencies {
 }
 
 export class NewPolygonUIController {
-  public pathPointComponents: PathPointComponent[] = [];
   private readonly application: Application;
   private readonly applicationUIContainer: HTMLElement;
   private readonly canvas: HTMLCanvasElement;
@@ -30,7 +28,6 @@ export class NewPolygonUIController {
   private readonly renderer: Renderer;
 
   private unfinishedPath: Path;
-  private startingPathPointComponent: PathPointComponent;
   private readonly pathLayer = new Layer(LEX.PATH_LAYER_NAME);
   private readonly polygonLayer: Layer;
 
@@ -61,25 +58,6 @@ export class NewPolygonUIController {
 
   public addNewPoint(point: Point) {
     this.unfinishedPath.addVertex(point);
-    const pathPointComponent = new PathPointComponent(
-      this.applicationUIContainer,
-      this.unfinishedPath,
-      point,
-      {
-        mousePositionTransformer: this.mousePositionTransformer,
-        application: this.application
-      }
-    );
-    pathPointComponent.enabled = true;
-
-    this.pathPointComponents.push(pathPointComponent);
-
-    if (this.unfinishedPath.getVerticesCount() === 1) {
-      this.startingPathPointComponent = pathPointComponent;
-      pathPointComponent.element.addEventListener('click', this.closePath);
-      pathPointComponent.initial = true;
-    }
-
     this.application.render();
   }
 
@@ -108,16 +86,8 @@ export class NewPolygonUIController {
 
     this.unfinishedPath.lineProperties = configuration.polygonLineProperties;
     const polygon = new Polygon(this.unfinishedPath);
-    this.startingPathPointComponent.path = polygon;
     this.polygonLayer.paths.push(polygon);
-
-    this.pathPointComponents
-      .filter(component => component.path === this.unfinishedPath)
-      .forEach(component => (component.path = polygon));
-
     this.pathLayer.removePath(this.unfinishedPath);
-    this.startingPathPointComponent.element.removeEventListener('click', this.closePath);
-    this.startingPathPointComponent.initial = false;
 
     this.startNewUnfinishedPath();
     this.application.render();
