@@ -2,7 +2,7 @@ import { AppEvent } from 'events/AppEvent';
 import { PathPointComponent } from 'ui/components/PathPointComponent';
 
 export class PointClickEvent implements AppEvent {
-  public eventType = PointClickEvent.eventType;
+  public readonly eventType = PointClickEvent.eventType;
   public readonly payload: PathPointComponent;
   public handled = false;
 
