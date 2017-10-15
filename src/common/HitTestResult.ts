@@ -1,8 +1,6 @@
 import { Layer } from 'common/Layer';
 import { Line } from 'common/Line';
 import { Path } from 'common/Path';
-import { Point } from 'common/Point';
-import { Polygon } from 'common/Polygon';
 
 export class HitTestResult {
   public readonly line: Line;

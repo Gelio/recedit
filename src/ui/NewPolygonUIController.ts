@@ -1,10 +1,10 @@
 import { Application } from 'Application';
-import { COLORS } from 'common/COLORS';
 import { Layer } from 'common/Layer';
-import { LineProperties } from 'common/LineProperties';
 import { Path } from 'common/Path';
 import { Point } from 'common/Point';
 import { Polygon } from 'common/Polygon';
+import { configuration } from 'configuration';
+import { LEX } from 'LEX';
 import { Renderer } from 'Renderer';
 import { Stage } from 'Stage';
 import { PathPointComponent } from 'ui/components/PathPointComponent';
@@ -21,6 +21,7 @@ interface NewPolygonUIControllerDependencies {
 }
 
 export class NewPolygonUIController {
+  public pathPointComponents: PathPointComponent[] = [];
   private readonly application: Application;
   private readonly applicationUIContainer: HTMLElement;
   private readonly canvas: HTMLCanvasElement;
@@ -30,11 +31,8 @@ export class NewPolygonUIController {
 
   private unfinishedPath: Path;
   private startingPathPointComponent: PathPointComponent;
-  private readonly pathLayer = new Layer('PathLayer');
+  private readonly pathLayer = new Layer(LEX.PATH_LAYER_NAME);
   private readonly polygonLayer: Layer;
-
-  private readonly newLinePreviewProperties = new LineProperties(COLORS.BLUE, 2);
-  private readonly newPolygonLineProperties = new LineProperties(COLORS.RED, 1);
 
   constructor(dependencies: NewPolygonUIControllerDependencies) {
     this.application = dependencies.application;
@@ -62,15 +60,21 @@ export class NewPolygonUIController {
   }
 
   public addNewPoint(point: Point) {
-    this.unfinishedPath.vertices.push(point);
+    this.unfinishedPath.addVertex(point);
     const pathPointComponent = new PathPointComponent(
       this.applicationUIContainer,
       this.unfinishedPath,
-      point
+      point,
+      {
+        mousePositionTransformer: this.mousePositionTransformer,
+        application: this.application
+      }
     );
     pathPointComponent.enabled = true;
 
-    if (this.unfinishedPath.vertices.length === 1) {
+    this.pathPointComponents.push(pathPointComponent);
+
+    if (this.unfinishedPath.getVerticesCount() === 1) {
       this.startingPathPointComponent = pathPointComponent;
       pathPointComponent.element.addEventListener('click', this.closePath);
       pathPointComponent.initial = true;
@@ -85,26 +89,31 @@ export class NewPolygonUIController {
       return;
     }
 
-    const lastPoint = this.unfinishedPath.vertices[unfinishedPathVerticesCount - 1];
+    const lastPoint = this.unfinishedPath.getVertex(unfinishedPathVerticesCount - 1);
     this.application.render();
 
     const point = this.mousePositionTransformer.getPointFromMouseEvent(event);
-    this.renderer.drawLine(lastPoint, point, this.newLinePreviewProperties);
+    this.renderer.drawLine(lastPoint, point, configuration.newLinePreviewProperties);
   }
 
   private startNewUnfinishedPath() {
-    this.unfinishedPath = new Path([], this.newPolygonLineProperties);
+    this.unfinishedPath = new Path([], configuration.newPolygonLineProperties);
     this.pathLayer.paths.push(this.unfinishedPath);
   }
 
   private closePath() {
-    if (this.unfinishedPath.getVerticesCount() < 3) {
-      return alert('Polygon must have at least 3 vertices');
+    if (this.unfinishedPath.getVerticesCount() < configuration.minPolygonPoints) {
+      return alert(`Polygon must have at least ${configuration.minPolygonPoints} vertices`);
     }
 
-    this.polygonLayer.paths.push(
-      new Polygon(this.unfinishedPath.vertices, LineProperties.getDefault())
-    );
+    this.unfinishedPath.lineProperties = configuration.polygonLineProperties;
+    const polygon = new Polygon(this.unfinishedPath);
+    this.startingPathPointComponent.path = polygon;
+    this.polygonLayer.paths.push(polygon);
+
+    this.pathPointComponents
+      .filter(component => component.path === this.unfinishedPath)
+      .forEach(component => (component.path = polygon));
 
     this.pathLayer.removePath(this.unfinishedPath);
     this.startingPathPointComponent.element.removeEventListener('click', this.closePath);

@@ -7,6 +7,7 @@ import { Point } from 'common/Point';
 import { LineRasterizer } from 'line-rasterizer/LineRasterizer';
 
 interface RendererDependencies {
+  canvas: HTMLCanvasElement;
   lineRasterizer: LineRasterizer;
 }
 
@@ -15,11 +16,9 @@ export class Renderer {
   private renderingContext: CanvasRenderingContext2D;
   private lineRasterizer: LineRasterizer;
 
-  private fillColor: Color;
-
-  constructor(canvas: HTMLCanvasElement, dependencies: RendererDependencies) {
-    this.canvas = canvas;
-    const context = canvas.getContext('2d');
+  constructor(dependencies: RendererDependencies) {
+    this.canvas = dependencies.canvas;
+    const context = this.canvas.getContext('2d');
     if (context === null) {
       throw new Error('Cannot get canvas 2d rendering context');
     }

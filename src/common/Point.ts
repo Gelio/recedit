@@ -1,8 +1,8 @@
 import { Octant } from 'common/Octant';
 
 export class Point {
-  public x: number;
-  public y: number;
+  public readonly x: number;
+  public readonly y: number;
 
   constructor(x: number, y: number) {
     this.x = x;

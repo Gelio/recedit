@@ -1,25 +1,46 @@
 import { Path } from 'common/Path';
 import { Point } from 'common/Point';
 
+import { Application } from 'Application';
+import { configuration } from 'configuration';
+import { MousePositionTransformer } from 'ui/MousePositionTransformer';
+
 import 'ui/components/PathPointComponent.scss';
 
+const COMPONENT_CLASS_NAME = 'application-ui__vertex';
 const ENABLED_CLASS_NAME = 'enabled';
 const INITIAL_CLASS_NAME = 'application-ui__vertex--initial';
 
+interface PathPointComponentDependencies {
+  mousePositionTransformer: MousePositionTransformer;
+  application: Application;
+}
+
 export class PathPointComponent {
   public element: HTMLDivElement;
+  public path: Path;
   private container: HTMLElement;
-  private path: Path;
   private point: Point;
+  private readonly mousePositionTransformer: MousePositionTransformer;
+  private readonly application: Application;
 
-  constructor(container: HTMLElement, path: Path, point: Point) {
+  private previousClickTimestamp: number = 0;
+
+  constructor(container: HTMLElement, path: Path, point: Point, dependencies: PathPointComponentDependencies) {
     this.container = container;
     this.path = path;
     this.point = point;
+    this.mousePositionTransformer = dependencies.mousePositionTransformer;
+    this.application = dependencies.application;
+
+    this.onMouseDown = this.onMouseDown.bind(this);
+    this.onMouseMove = this.onMouseMove.bind(this);
+    this.stopMoving = this.stopMoving.bind(this);
     this.init();
   }
 
   public remove() {
+    this.element.removeEventListener('mousedown', this.onMouseDown);
     this.element.remove();
   }
 
@@ -33,42 +54,71 @@ export class PathPointComponent {
   }
 
   public set enabled(enable: boolean) {
-    const enabled = this.enabled;
-
-    if (enable && enabled) {
-      return;
-    } else if (!enable && !enabled) {
-      return;
-    }
-
-    this.element.classList.toggle(ENABLED_CLASS_NAME);
+    this.addOrRemoveElementClass(ENABLED_CLASS_NAME, enable);
   }
 
   public get initial() {
     return this.element.classList.contains(INITIAL_CLASS_NAME);
   }
 
-  public set initial(initial: boolean) {
-    const isCurrentlyInitial = this.initial;
+  public set initial(isInitial: boolean) {
+    this.addOrRemoveElementClass(INITIAL_CLASS_NAME, isInitial);
+  }
 
-    if (initial && isCurrentlyInitial) {
-      return;
-    } else if (!initial && !isCurrentlyInitial) {
-      return;
+  private addOrRemoveElementClass(className: string, value: boolean) {
+    if (value) {
+      this.element.classList.add(className);
+    } else {
+      this.element.classList.remove(className);
     }
-
-    this.element.classList.toggle(INITIAL_CLASS_NAME);
   }
 
   private init() {
     this.element = document.createElement('div');
     this.container.appendChild(this.element);
 
-    this.element.classList.add('application-ui__vertex');
+    this.element.classList.add(COMPONENT_CLASS_NAME);
     this.updatePosition();
 
-    this.element.addEventListener('click', () => {
-      console.log('Clicked', this.element);
-    });
+    this.element.addEventListener('mousedown', this.onMouseDown);
+  }
+
+  private onMouseDown() {
+    if (this.initial) {
+      return;
+    }
+
+    const currentTimestamp = Date.now();
+
+    if (currentTimestamp - this.previousClickTimestamp <= configuration.doubleClickMaxDelay) {
+      try {
+        this.path.removeVertex(this.point);
+      } catch (error) {
+        alert('Cannot remove vertex');
+
+        return;
+      }
+      this.remove();
+      this.application.render();
+
+      return;
+    }
+    this.previousClickTimestamp = currentTimestamp;
+
+    window.addEventListener('mousemove', this.onMouseMove);
+    window.addEventListener('mouseup', this.stopMoving);
+  }
+
+  private onMouseMove(event: MouseEvent) {
+    const mousePosition = this.mousePositionTransformer.getPointFromMouseEvent(event);
+    this.path.movePoint(this.point, mousePosition);
+    this.point = mousePosition;
+    this.updatePosition();
+    this.application.render();
+  }
+
+  private stopMoving() {
+    window.removeEventListener('mousemove', this.onMouseMove);
+    window.removeEventListener('mouseup', this.stopMoving);
   }
 }

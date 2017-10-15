@@ -1,3 +1,5 @@
+import { Layer } from 'common/Layer';
+import { LEX } from 'LEX';
 import { LineRasterizer } from 'line-rasterizer/LineRasterizer';
 import { Renderer } from 'Renderer';
 import { Stage } from 'Stage';
@@ -11,12 +13,20 @@ export class Application {
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
-    this.renderer = new Renderer(this.canvas, { lineRasterizer: new LineRasterizer() });
+    this.renderer = new Renderer({ lineRasterizer: new LineRasterizer(), canvas: this.canvas });
     this.stage = new Stage();
-    this.uiController = new UIController(this.canvas, { application: this, renderer: this.renderer, stage: this.stage });
+    this.uiController = new UIController({
+      application: this,
+      renderer: this.renderer,
+      stage: this.stage,
+      canvas: this.canvas
+    });
   }
 
   public init() {
+    const polygonLayer = new Layer(LEX.POLYGON_LAYER_NAME);
+    this.stage.layers.push(polygonLayer);
+
     this.uiController.init();
   }
 

@@ -2,13 +2,12 @@ import { HitTestResult } from 'common/HitTestResult';
 import { Line } from 'common/Line';
 import { LineProperties } from 'common/LineProperties';
 import { Point } from 'common/Point';
-
-const HIT_TOLERANCE = 10;
+import { configuration } from 'configuration';
 
 export class Path {
   public closed: boolean = false;
-  public vertices: Point[];
   public lineProperties: LineProperties;
+  protected readonly vertices: Point[];
 
   constructor(vertices: Point[], lineProperties: LineProperties) {
     this.vertices = vertices;
@@ -54,11 +53,54 @@ export class Path {
 
   public hitTest(point: Point): HitTestResult | null {
     for (const line of this.getLineIterator()) {
-      if (line.distanceToPoint(point) <= HIT_TOLERANCE) {
+      if (line.distanceToPoint(point) <= configuration.hitTolerance) {
         return new HitTestResult(line, this);
       }
     }
 
     return null;
+  }
+
+  public getVertex(index: number): Point {
+    return this.vertices[index];
+  }
+
+  public getVertices(): Point[] {
+    return this.vertices;
+  }
+
+  public addVertex(point: Point) {
+    this.vertices.push(point);
+  }
+
+  public removeVertex(point: Point) {
+    const index = this.findPointIndex(point);
+
+    if (index !== -1) {
+      this.vertices.splice(index, 1);
+    }
+  }
+
+  public insertVertex(point: Point, index: number) {
+    this.vertices.splice(index, 0, point);
+  }
+
+  public movePoint(point: Point, newPosition: Point) {
+    const index = this.findPointIndex(point);
+
+    if (index !== -1) {
+      this.vertices.splice(index, 1, newPosition);
+    }
+  }
+
+  public clone(): Path {
+    const vertices = this.getVertices();
+    const lineProperties = this.lineProperties.clone();
+
+    return new Path(vertices, lineProperties);
+  }
+
+  public findPointIndex(point: Point) {
+    return this.vertices.findIndex(otherPoint => otherPoint.equals(point));
   }
 }
