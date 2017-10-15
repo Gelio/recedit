@@ -77,8 +77,12 @@ export class PointSyncService {
   }
 
   private getRedundantComponents() {
+    const activePaths = this.getActivePaths();
+
     return this.pathPointComponents.filter(
-      component => component.path.findPointIndex(component.point) === -1
+      component =>
+        activePaths.indexOf(component.path) === -1 ||
+        component.path.findPointIndex(component.point) === -1
     );
   }
 
@@ -89,5 +93,12 @@ export class PointSyncService {
           component => component.path === pathPoint.path && component.point === pathPoint.point
         )
     );
+  }
+
+  private getActivePaths() {
+    const paths: Path[] = [];
+    this.stage.layers.map(layer => paths.push(...layer.paths));
+
+    return paths;
   }
 }
