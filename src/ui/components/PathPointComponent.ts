@@ -51,6 +51,7 @@ export class PathPointComponent {
   }
 
   public updatePosition() {
+    this.element.style.backgroundColor = this.path.lineProperties.color.fillStyle;
     this.element.style.top = `${this.point.y}px`;
     this.element.style.left = `${this.point.x}px`;
   }
@@ -74,7 +75,10 @@ export class PathPointComponent {
     this.element.classList.add(COMPONENT_CLASS_NAME);
     this.updatePosition();
 
-    if (this.path.getVerticesCount() === 1) {
+    if (
+      this.path.getVerticesCount() === 1 ||
+      (!this.path.closed && this.path.findPointIndex(this.point) === 0)
+    ) {
       this.initial = true;
     }
 
