@@ -1,7 +1,6 @@
 import { COLORS } from 'common/COLORS';
 import { Layer } from 'common/Layer';
 import { LineProperties } from 'common/LineProperties';
-import { Point } from 'common/Point';
 import { configuration } from 'configuration';
 import { EventAggregator } from 'events/EventAggregator';
 import { LEX } from 'LEX';
@@ -79,30 +78,10 @@ export class PointDraggingService {
   private onPointDrag(event: PointDragEvent) {
     const { component, newPosition } = event.payload;
 
-    component.path
-      .getVertices()
-      .filter(point => point !== component.point)
-      .forEach(point => component.path.movePoint(point, this.getNewPointPosition(point)));
-
     component.path.movePoint(component.point, newPosition);
     component.point = newPosition;
 
     this.eventAggregator.dispatchEvent(new RenderEvent());
     event.handled = true;
-  }
-
-  private getNewPointPosition(point: Point) {
-    const maxTranslation = 5;
-    const translationVertex = new Point(
-      this.getRandomInt(-maxTranslation, maxTranslation),
-      this.getRandomInt(-maxTranslation, maxTranslation)
-    );
-
-    return Point.add(point, translationVertex);
-  }
-
-  private getRandomInt(min: number, max: number) {
-    // tslint:disable-next-line
-    return Math.floor(Math.random() * (max - min + 1) + min);
   }
 }
