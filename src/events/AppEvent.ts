@@ -1,6 +1,6 @@
 export interface AppEvent {
   // tslint:disable-next-line no-any
-  payload: any;
-  eventType: string;
+  readonly payload: any;
+  readonly eventType: string;
   handled: boolean;
 }
