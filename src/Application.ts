@@ -44,7 +44,7 @@ export class Application {
     this.removeEventListeners();
   }
 
-  public render(event: RenderEvent) {
+  private render(event: RenderEvent) {
     this.renderer.clear();
     this.stage.render(this.renderer);
     this.uiController.update();
