@@ -1,4 +1,3 @@
-import { Application } from 'Application';
 import { Layer } from 'common/Layer';
 import { Path } from 'common/Path';
 import { Point } from 'common/Point';
@@ -9,39 +8,44 @@ import { Renderer } from 'Renderer';
 import { Stage } from 'Stage';
 import { MousePositionTransformer } from 'ui/MousePositionTransformer';
 
+import { EventAggregator } from 'events/EventAggregator';
+import { PointClickEvent } from 'events/PointClickEvent';
+import { RenderEvent } from 'events/RenderEvent';
+
 interface NewPolygonUIControllerDependencies {
-  application: Application;
   applicationUIContainer: HTMLElement;
   canvas: HTMLCanvasElement;
   mousePositionTransformer: MousePositionTransformer;
   polygonLayer: Layer;
   renderer: Renderer;
   stage: Stage;
+  eventAggregator: EventAggregator;
 }
 
 export class NewPolygonUIController {
-  private readonly application: Application;
   private readonly applicationUIContainer: HTMLElement;
   private readonly canvas: HTMLCanvasElement;
   private readonly stage: Stage;
   private readonly mousePositionTransformer: MousePositionTransformer;
   private readonly renderer: Renderer;
+  private readonly eventAggregator: EventAggregator;
 
   private unfinishedPath: Path;
   private readonly pathLayer = new Layer(LEX.PATH_LAYER_NAME);
   private readonly polygonLayer: Layer;
 
   constructor(dependencies: NewPolygonUIControllerDependencies) {
-    this.application = dependencies.application;
     this.applicationUIContainer = dependencies.applicationUIContainer;
     this.canvas = dependencies.canvas;
     this.stage = dependencies.stage;
     this.polygonLayer = dependencies.polygonLayer;
     this.mousePositionTransformer = dependencies.mousePositionTransformer;
     this.renderer = dependencies.renderer;
+    this.eventAggregator = dependencies.eventAggregator;
 
     this.closePath = this.closePath.bind(this);
     this.onMouseMove = this.onMouseMove.bind(this);
+    this.onPointClick = this.onPointClick.bind(this);
   }
 
   public init() {
@@ -49,29 +53,39 @@ export class NewPolygonUIController {
     this.startNewUnfinishedPath();
 
     this.canvas.addEventListener('mousemove', this.onMouseMove);
+    this.eventAggregator.addEventListener(PointClickEvent.eventType, this.onPointClick);
   }
 
   public destroy() {
     this.canvas.removeEventListener('mousemove', this.onMouseMove);
+    this.eventAggregator.removeEventListener(PointClickEvent.eventType, this.onPointClick);
     this.stage.removeLayer(this.pathLayer);
   }
 
   public addNewPoint(point: Point) {
     this.unfinishedPath.addVertex(point);
-    this.application.render();
+    this.eventAggregator.dispatchEvent(new RenderEvent());
   }
 
-  public onMouseMove(event: MouseEvent) {
+  private onMouseMove(event: MouseEvent) {
     const unfinishedPathVerticesCount = this.unfinishedPath.getVerticesCount();
     if (unfinishedPathVerticesCount === 0) {
       return;
     }
 
     const lastPoint = this.unfinishedPath.getVertex(unfinishedPathVerticesCount - 1);
-    this.application.render();
+    this.eventAggregator.dispatchEvent(new RenderEvent());
 
     const point = this.mousePositionTransformer.getPointFromMouseEvent(event);
     this.renderer.drawLine(lastPoint, point, configuration.newLinePreviewProperties);
+  }
+
+  private onPointClick(event: PointClickEvent) {
+    const pathPointComponent = event.payload;
+    if (pathPointComponent.path === this.unfinishedPath && pathPointComponent.initial) {
+      pathPointComponent.initial = false;
+      this.closePath();
+    }
   }
 
   private startNewUnfinishedPath() {
@@ -90,6 +104,6 @@ export class NewPolygonUIController {
     this.pathLayer.removePath(this.unfinishedPath);
 
     this.startNewUnfinishedPath();
-    this.application.render();
+    this.eventAggregator.dispatchEvent(new RenderEvent());
   }
 }
