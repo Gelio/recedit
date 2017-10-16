@@ -10,6 +10,7 @@ import { LineClickEvent } from 'events/LineClickEvent';
 import { LEX } from 'LEX';
 
 import { ConditionFixer } from 'conditions/ConditionFixer';
+import { ConditionMatcher } from 'conditions/ConditionMatcher';
 
 import { RenderEvent } from 'events/RenderEvent';
 import { SyncComponentsEvent } from 'events/ui/SyncComponentsEvent';
@@ -17,11 +18,13 @@ import { SyncComponentsEvent } from 'events/ui/SyncComponentsEvent';
 interface UIConditionControllerDependencies {
   eventAggregator: EventAggregator;
   applicationUIContainer: HTMLElement;
+  conditionMatcher: ConditionMatcher;
 }
 
 export class UIConditionController implements UIService {
   private readonly eventAggregator: EventAggregator;
   private readonly applicationUIContainer: HTMLElement;
+  private readonly conditionMatcher: ConditionMatcher;
 
   private readonly conditionPicker: ConditionPicker = new ConditionPicker();
   private previousLineClickTimestamp = 0;
@@ -29,6 +32,7 @@ export class UIConditionController implements UIService {
   constructor(dependencies: UIConditionControllerDependencies) {
     this.eventAggregator = dependencies.eventAggregator;
     this.applicationUIContainer = dependencies.applicationUIContainer;
+    this.conditionMatcher = dependencies.conditionMatcher;
 
     this.onLineClick = this.onLineClick.bind(this);
     this.onNewCondition = this.onNewCondition.bind(this);
@@ -74,6 +78,13 @@ export class UIConditionController implements UIService {
 
   private onNewCondition(event: CustomEvent) {
     const lineCondition: LineCondition = event.detail;
+
+    try {
+      lineCondition.verifyCanBeApplied();
+      this.conditionMatcher.verifyConditionAllowed(lineCondition);
+    } catch (error) {
+      return alert(`Cannot apply condition: ${error.message}`);
+    }
 
     if (!lineCondition.isMet()) {
       const realPolygon = lineCondition.polygon;

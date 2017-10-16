@@ -12,6 +12,8 @@ import { PointRemoverService } from 'ui/PointRemoverService';
 import { PointSyncService } from 'ui/PointSyncService';
 import { UIService } from 'ui/UIService';
 
+import { ConditionMatcher } from 'conditions/ConditionMatcher';
+
 import { EventAggregator } from 'events/EventAggregator';
 import { LineClickEvent } from 'events/LineClickEvent';
 
@@ -143,7 +145,8 @@ export class UIController {
   private createUIConditionController() {
     const uiConditionController = new UIConditionController({
       eventAggregator: this.eventAggregator,
-      applicationUIContainer: this.applicationUIContainer
+      applicationUIContainer: this.applicationUIContainer,
+      conditionMatcher: new ConditionMatcher()
     });
 
     this.uiServices.push(uiConditionController);
