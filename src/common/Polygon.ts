@@ -55,19 +55,47 @@ export class Polygon extends Path {
     return polygon;
   }
 
+  public insertVertex(point: Point, index: number) {
+    const previousPointIndex = this.getPreviousPointIndex(index);
+
+    const previousLine = new Line(this.getVertex(previousPointIndex), this.getVertex(index));
+    const matchingConditions = this.lineConditions.filter(lineCondition =>
+      lineCondition.line.equals(previousLine)
+    );
+
+    if (matchingConditions.length > 0) {
+      throw new Error(
+        `Cannot insert a point because of an existing condition (${matchingConditions[0].constructor
+          .name})`
+      );
+    }
+
+    super.insertVertex(point, index);
+  }
+
+  public getNextPointIndex(index: number) {
+    return (index + 1) % this.getVerticesCount();
+  }
+
   public getNextPoint(point: Point) {
     const index = this.vertices.indexOf(point);
-    const nextPointIndex = (index + 1) % this.getVerticesCount();
+    const nextPointIndex = this.getNextPointIndex(index);
 
     return this.getVertex(nextPointIndex);
   }
 
-  public getPreviousPoint(point: Point) {
-    const index = this.vertices.indexOf(point);
+  public getPreviousPointIndex(index: number) {
     let previousPointIndex = index - 1;
     if (previousPointIndex < 0) {
       previousPointIndex = this.getVerticesCount() - 1;
     }
+
+    return previousPointIndex;
+  }
+
+  public getPreviousPoint(point: Point) {
+    const index = this.vertices.indexOf(point);
+    const previousPointIndex = this.getPreviousPointIndex(index);
 
     return this.getVertex(previousPointIndex);
   }

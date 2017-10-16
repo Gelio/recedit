@@ -50,7 +50,11 @@ export class PointInserterService implements UIService {
       const index = event.payload.path.findPointIndex(event.payload.line.p2);
       const newPoint = event.payload.line.getMiddlePoint();
 
-      event.payload.path.insertVertex(newPoint, index);
+      try {
+        event.payload.path.insertVertex(newPoint, index);
+      } catch (error) {
+        return alert(error.message);
+      }
       this.eventAggregator.dispatchEvent(new RenderEvent());
       this.eventAggregator.dispatchEvent(new SyncComponentsEvent());
     }
