@@ -11,6 +11,7 @@ import { FinishPointDragEvent } from 'events/point-drag/FinishPointDragEvent';
 import { PointDragEvent } from 'events/point-drag/PointDragEvent';
 import { StartPointDragEvent } from 'events/point-drag/StartPointDragEvent';
 import { RenderEvent } from 'events/RenderEvent';
+import { SyncComponentsEvent } from 'events/ui/SyncComponentsEvent';
 
 interface PointDraggingServiceDependencies {
   eventAggregator: EventAggregator;
@@ -63,6 +64,7 @@ export class PointDraggingService {
     this.pathGhostLayer.paths.push(path);
 
     this.eventAggregator.dispatchEvent(new RenderEvent());
+    this.eventAggregator.dispatchEvent(new SyncComponentsEvent());
   }
 
   private onFinishPointDrag(event: FinishPointDragEvent) {
@@ -74,6 +76,7 @@ export class PointDraggingService {
     this.pathGhostLayer.paths = [];
 
     this.eventAggregator.dispatchEvent(new RenderEvent());
+    this.eventAggregator.dispatchEvent(new SyncComponentsEvent());
   }
 
   private onPointDrag(event: PointDragEvent) {
