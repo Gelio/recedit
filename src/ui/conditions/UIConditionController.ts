@@ -93,6 +93,7 @@ export class UIConditionController implements UIService {
     lineCondition.polygon.addLineCondition(lineCondition);
     this.eventAggregator.dispatchEvent(new RenderEvent());
     this.eventAggregator.dispatchEvent(new SyncComponentsEvent());
+    this.conditionPicker.updateButtons();
 
     console.log('New condition', lineCondition);
     console.log('Is met:', lineCondition.isMet());

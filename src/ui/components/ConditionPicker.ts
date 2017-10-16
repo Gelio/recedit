@@ -84,6 +84,10 @@ export class ConditionPicker extends HTMLElement {
     this.selectedTarget.line = line;
     this.selectedTarget.polygon = polygon;
 
+    this.updateButtons();
+  }
+
+  public updateButtons() {
     this.lineConditionElements.forEach(element => element.updateButton());
   }
 
