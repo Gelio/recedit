@@ -20,4 +20,12 @@ export class FixedLengthLineCondition extends LineCondition {
 
     return lengthSquared === this.fixedLengthSquared;
   }
+
+  public fix(_lockedPoint: Point) {
+    throw new Error('Not implemented');
+  }
+
+  public duplicateForNewLine(line: Line, polygon: Polygon) {
+    return new FixedLengthLineCondition(line, polygon, this.fixedLength);
+  }
 }
