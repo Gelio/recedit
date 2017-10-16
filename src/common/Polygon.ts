@@ -78,6 +78,11 @@ export class Polygon extends Path {
     }
 
     super.removeVertex(point);
+
+    const lineConditionsToRemove = this.lineConditions.filter(
+      lineCondition => lineCondition.line.p1 === point || lineCondition.line.p2 === point
+    );
+    lineConditionsToRemove.forEach(lineCondition => this.removeLineCondition(lineCondition));
   }
 
   public addLineCondition(lineCondition: LineCondition) {
