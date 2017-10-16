@@ -37,6 +37,16 @@ export class Point {
     return Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2);
   }
 
+  public static getAngle(p1: Point, p2: Point): number {
+    let angle = (Math.atan2(p2.y - p1.y, p2.x - p1.x)) * 180 / Math.PI;
+
+    if (angle < 0) {
+      angle += 360;
+    }
+
+    return angle;
+  }
+
   public moveTo(point: Point): void;
   public moveTo(x: number, y: number): void;
   public moveTo(pointOrX: Point | number, y?: number) {

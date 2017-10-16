@@ -22,4 +22,8 @@ export class LineCondition {
   public duplicateForNewLine(_line: Line, _polygon: Polygon): LineCondition {
     throw new Error('Not implemented');
   }
+
+  public verifyCanBeApplied() {
+    throw new Error('Not implemented');
+  }
 }

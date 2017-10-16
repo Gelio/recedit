@@ -10,6 +10,7 @@ import { LineClickEvent } from 'events/LineClickEvent';
 import { LEX } from 'LEX';
 
 import { ConditionFixer } from 'conditions/ConditionFixer';
+import { ConditionMatcher } from 'conditions/ConditionMatcher';
 
 import { RenderEvent } from 'events/RenderEvent';
 import { SyncComponentsEvent } from 'events/ui/SyncComponentsEvent';
@@ -17,11 +18,13 @@ import { SyncComponentsEvent } from 'events/ui/SyncComponentsEvent';
 interface UIConditionControllerDependencies {
   eventAggregator: EventAggregator;
   applicationUIContainer: HTMLElement;
+  conditionMatcher: ConditionMatcher;
 }
 
 export class UIConditionController implements UIService {
   private readonly eventAggregator: EventAggregator;
   private readonly applicationUIContainer: HTMLElement;
+  private readonly conditionMatcher: ConditionMatcher;
 
   private readonly conditionPicker: ConditionPicker = new ConditionPicker();
   private previousLineClickTimestamp = 0;
@@ -29,20 +32,28 @@ export class UIConditionController implements UIService {
   constructor(dependencies: UIConditionControllerDependencies) {
     this.eventAggregator = dependencies.eventAggregator;
     this.applicationUIContainer = dependencies.applicationUIContainer;
+    this.conditionMatcher = dependencies.conditionMatcher;
 
     this.onLineClick = this.onLineClick.bind(this);
     this.onNewCondition = this.onNewCondition.bind(this);
+    this.onRemoveCondition = this.onRemoveCondition.bind(this);
   }
 
   public init() {
     this.eventAggregator.addEventListener(LineClickEvent.eventType, this.onLineClick);
     this.applicationUIContainer.appendChild(this.conditionPicker);
     this.conditionPicker.addEventListener(LEX.NEW_CONDITION_EVENT_NAME, this.onNewCondition);
+    this.conditionPicker.addEventListener(LEX.REMOVE_CONDITION_EVENT_NAME, this.onRemoveCondition);
     this.conditionPicker.setAttribute('data-visible', 'false');
   }
 
   public destroy() {
     this.eventAggregator.removeEventListener(LineClickEvent.eventType, this.onLineClick);
+    this.conditionPicker.removeEventListener(LEX.NEW_CONDITION_EVENT_NAME, this.onNewCondition);
+    this.conditionPicker.removeEventListener(
+      LEX.REMOVE_CONDITION_EVENT_NAME,
+      this.onRemoveCondition
+    );
     this.applicationUIContainer.removeChild(this.conditionPicker);
   }
 
@@ -68,6 +79,13 @@ export class UIConditionController implements UIService {
   private onNewCondition(event: CustomEvent) {
     const lineCondition: LineCondition = event.detail;
 
+    try {
+      lineCondition.verifyCanBeApplied();
+      this.conditionMatcher.verifyConditionAllowed(lineCondition);
+    } catch (error) {
+      return alert(`Cannot apply condition: ${error.message}`);
+    }
+
     if (!lineCondition.isMet()) {
       const realPolygon = lineCondition.polygon;
       const p1Index = realPolygon.findPointIndex(lineCondition.line.p1);
@@ -75,7 +93,10 @@ export class UIConditionController implements UIService {
       const polygonClone = realPolygon.clone();
 
       const conditionFixer = new ConditionFixer(polygonClone, polygonClone.getVertex(p1Index), [
-        lineCondition.duplicateForNewLine(new Line(polygonClone.getVertex(p1Index), polygonClone.getVertex(p2Index)), polygonClone)
+        lineCondition.duplicateForNewLine(
+          new Line(polygonClone.getVertex(p1Index), polygonClone.getVertex(p2Index)),
+          polygonClone
+        )
       ]);
       conditionFixer.tryFix();
 
@@ -93,8 +114,16 @@ export class UIConditionController implements UIService {
     lineCondition.polygon.addLineCondition(lineCondition);
     this.eventAggregator.dispatchEvent(new RenderEvent());
     this.eventAggregator.dispatchEvent(new SyncComponentsEvent());
+    this.conditionPicker.updateButtons();
 
     console.log('New condition', lineCondition);
     console.log('Is met:', lineCondition.isMet());
+  }
+
+  private onRemoveCondition(event: CustomEvent) {
+    const lineCondition: LineCondition = event.detail;
+
+    lineCondition.polygon.removeLineCondition(lineCondition);
+    this.conditionPicker.updateButtons();
   }
 }

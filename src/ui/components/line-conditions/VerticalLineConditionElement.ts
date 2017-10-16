@@ -1,64 +1,25 @@
+import { LineCondition } from 'conditions/LineCondition';
 import { VerticalLineCondition } from 'conditions/VerticalLineCondition';
-import { LEX } from 'LEX';
-import {
-  LineConditionElementDependencies,
-  SelectedTarget
-} from 'ui/components/line-conditions/LineConditionElementDependencies';
+import { LineConditionElement } from 'ui/components/line-conditions/LineConditionElement';
+import { LineConditionElementDependencies } from 'ui/components/line-conditions/LineConditionElementDependencies';
 
-export class VerticalLineConditionElement extends HTMLElement {
-  private readonly button: HTMLButtonElement;
-
-  private readonly selectedTarget: SelectedTarget;
-
+export class VerticalLineConditionElement extends LineConditionElement {
   constructor(dependencies: LineConditionElementDependencies) {
-    super();
+    super(dependencies);
 
-    this.selectedTarget = dependencies.selectedTarget;
-
-    this.button = document.createElement('button');
     this.button.textContent = 'Vertical';
-    this.button.addEventListener('click', this.onButtonClick.bind(this));
   }
 
-  public connectedCallback() {
-    this.appendChild(this.button);
-    this.updateButton();
+  protected getLineConditionConstructor() {
+    return VerticalLineCondition;
   }
 
-  public disconnectedCallback() {
-    this.removeChild(this.button);
-  }
-
-  private onButtonClick(event: MouseEvent) {
-    event.stopPropagation();
-
+  protected createNewCondition(): LineCondition | null {
     if (!this.selectedTarget.line || !this.selectedTarget.polygon) {
-      return console.log('Target not selected');
+      throw new Error('Target not selected');
     }
 
-    const condition = new VerticalLineCondition(
-      this.selectedTarget.line,
-      this.selectedTarget.polygon
-    );
-
-    this.dispatchEvent(
-      new CustomEvent(LEX.NEW_CONDITION_EVENT_NAME, { bubbles: true, detail: condition })
-    );
-    this.updateButton();
-  }
-
-  private updateButton() {
-    if (!this.selectedTarget.line || !this.selectedTarget.polygon) {
-      return;
-    }
-    const polygon = this.selectedTarget.polygon;
-    const line = this.selectedTarget.line;
-
-    const lineConditions = polygon.getLineConditions();
-    const matchingConditions = lineConditions
-      .filter(lineCondition => lineCondition.line.equals(line));
-
-    this.button.disabled = matchingConditions.length > 0;
+    return new VerticalLineCondition(this.selectedTarget.line, this.selectedTarget.polygon);
   }
 }
 
