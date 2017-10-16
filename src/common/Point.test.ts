@@ -102,6 +102,51 @@ describe('Point', () => {
     });
   });
 
+  describe('clone', () => {
+    it('should return a point with the same coordinates', () => {
+      const point = new Point(1, 2);
+      const clonedPoint = point.clone();
+
+      expect(clonedPoint.x).toBe(point.x);
+      expect(clonedPoint.y).toBe(point.y);
+    });
+
+    it('should return a new point', () => {
+      const point = new Point(1, 2);
+      const clonedPoint = point.clone();
+
+      expect(clonedPoint).not.toBe(point);
+    });
+  });
+
+  describe('moveTo', () => {
+    it('should move the point to coordinates', () => {
+      const point = new Point(1, 2);
+
+      point.moveTo(5, 6);
+      expect(point.x).toBe(5);
+      expect(point.y).toBe(6);
+    });
+
+    it('should move the point to other point', () => {
+      const point = new Point(1, 2);
+      const destination = new Point(5, 6);
+
+      point.moveTo(destination);
+      expect(point.x).toBe(5);
+      expect(point.y).toBe(6);
+    });
+
+    it('should invoke moveCallback', () => {
+      const moveCallback = jest.fn();
+      const point = new Point(1, 2);
+      point.moveCallback = moveCallback;
+
+      point.moveTo(5, 6);
+      expect(moveCallback).toHaveBeenCalled();
+    });
+  });
+
   describe('static', () => {
     describe('add', () => {
       it('should return a new point with added coordinates', () => {
