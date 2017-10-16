@@ -11,6 +11,7 @@ import { MousePositionTransformer } from 'ui/MousePositionTransformer';
 import { EventAggregator } from 'events/EventAggregator';
 import { PointClickEvent } from 'events/PointClickEvent';
 import { RenderEvent } from 'events/RenderEvent';
+import { SyncComponentsEvent } from 'events/ui/SyncComponentsEvent';
 
 interface NewPolygonUIControllerDependencies {
   applicationUIContainer: HTMLElement;
@@ -65,6 +66,7 @@ export class NewPolygonUIController {
   public addNewPoint(point: Point) {
     this.unfinishedPath.addVertex(point);
     this.eventAggregator.dispatchEvent(new RenderEvent());
+    this.eventAggregator.dispatchEvent(new SyncComponentsEvent());
   }
 
   private onMouseMove(event: MouseEvent) {
@@ -112,5 +114,6 @@ export class NewPolygonUIController {
 
     this.startNewUnfinishedPath();
     this.eventAggregator.dispatchEvent(new RenderEvent());
+    this.eventAggregator.dispatchEvent(new SyncComponentsEvent());
   }
 }

@@ -6,6 +6,7 @@ import { PathPointComponent } from 'ui/components/PathPointComponent';
 import { MousePositionTransformer } from 'ui/MousePositionTransformer';
 
 import { EventAggregator } from 'events/EventAggregator';
+import { SyncComponentsEvent } from 'events/ui/SyncComponentsEvent';
 
 interface PointSyncServiceDependencies {
   stage: Stage;
@@ -31,22 +32,32 @@ export class PointSyncService {
     this.container = dependencies.container;
     this.mousePositionTransformer = dependencies.mousePositionTransformer;
     this.eventAggregator = dependencies.eventAggregator;
+
+    this.synchronizeComponents = this.synchronizeComponents.bind(this);
   }
 
-  public synchronizeComponents() {
-    const pathPoints = this.getPathPoints();
+  public init() {
+    this.eventAggregator.addEventListener(SyncComponentsEvent.eventType, this.synchronizeComponents);
+  }
 
+  public destroy() {
+    this.eventAggregator.removeEventListener(SyncComponentsEvent.eventType, this.synchronizeComponents);
+  }
+
+  public synchronizeComponents(event: SyncComponentsEvent) {
     const componentsToRemove = this.getRedundantComponents();
+    componentsToRemove.forEach(component => component.remove());
+
+    const pathPoints = this.getPathPoints();
     const pointsWithoutComponents = this.getPointsWithoutComponents(pathPoints);
     const newComponents = this.createPathPointComponents(pointsWithoutComponents);
 
-    const componentsToSync = this.pathPointComponents.filter(
+    const componentsNotRemoved = this.pathPointComponents.filter(
       component => componentsToRemove.indexOf(component) === -1
     );
-    componentsToSync.forEach(component => component.updatePosition());
 
-    componentsToRemove.forEach(component => component.remove());
-    this.pathPointComponents = [...newComponents, ...componentsToSync];
+    this.pathPointComponents = [...newComponents, ...componentsNotRemoved];
+    event.handled = true;
   }
 
   private getPathPoints() {
@@ -69,7 +80,8 @@ export class PointSyncService {
   private createPathPointComponents(pathPoints: PathPoint[]) {
     return pathPoints.map(
       pathPoint =>
-        new PathPointComponent(this.container, pathPoint.path, pathPoint.point, {
+        new PathPointComponent(pathPoint.path, pathPoint.point, {
+          applicationUIContainer: this.container,
           eventAggregator: this.eventAggregator,
           mousePositionTransformer: this.mousePositionTransformer
         })
@@ -82,7 +94,7 @@ export class PointSyncService {
     return this.pathPointComponents.filter(
       component =>
         activePaths.indexOf(component.path) === -1 ||
-        component.path.findPointIndex(component.point) === -1
+        component.path.getVertices().indexOf(component.point) === -1
     );
   }
 

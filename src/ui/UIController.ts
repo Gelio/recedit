@@ -12,6 +12,7 @@ import { PointSyncService } from 'ui/PointSyncService';
 
 import { EventAggregator } from 'events/EventAggregator';
 import { RenderEvent } from 'events/RenderEvent';
+import { SyncComponentsEvent } from 'events/ui/SyncComponentsEvent';
 
 interface UIControllerDependencies {
   canvas: HTMLCanvasElement;
@@ -59,6 +60,7 @@ export class UIController {
       stage: this.stage,
       eventAggregator: this.eventAggregator
     });
+    this.pointSyncService.init();
 
     this.pointRemoverService = new PointRemoverService({
       eventAggregator: this.eventAggregator
@@ -87,13 +89,10 @@ export class UIController {
 
   public destroy() {
     this.canvas.removeEventListener('click', this.onClick);
+    this.pointSyncService.destroy();
     this.newPolygonUIController.destroy();
     this.pointRemoverService.destroy();
     this.pointDraggingService.destroy();
-  }
-
-  public update() {
-    this.pointSyncService.synchronizeComponents();
   }
 
   private onClick(event: MouseEvent) {
@@ -128,6 +127,7 @@ export class UIController {
 
       hitTestResult.path.insertVertex(newPoint, index);
       this.eventAggregator.dispatchEvent(new RenderEvent());
+      this.eventAggregator.dispatchEvent(new SyncComponentsEvent());
     }
   }
 }

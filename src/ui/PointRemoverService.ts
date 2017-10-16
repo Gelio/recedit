@@ -3,6 +3,7 @@ import { configuration } from 'configuration';
 import { EventAggregator } from 'events/EventAggregator';
 import { PointClickEvent } from 'events/PointClickEvent';
 import { RenderEvent } from 'events/RenderEvent';
+import { SyncComponentsEvent } from 'events/ui/SyncComponentsEvent';
 import { PathPointComponent } from 'ui/components/PathPointComponent';
 
 interface PointRemoverServiceDependencies {
@@ -61,13 +62,11 @@ export class PointRemoverService {
     try {
       path.removeVertex(point);
     } catch (error) {
-      alert('Cannot remove vertex');
-      console.error(error);
-
-      return;
+      return alert('Cannot remove vertex');
     }
 
     this.previousPathPointComponent.remove();
     this.eventAggregator.dispatchEvent(new RenderEvent());
+    this.eventAggregator.dispatchEvent(new SyncComponentsEvent());
   }
 }

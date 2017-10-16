@@ -47,7 +47,6 @@ export class Application {
   private render(event: RenderEvent) {
     this.renderer.clear();
     this.stage.render(this.renderer);
-    this.uiController.update();
     event.handled = true;
   }
 
