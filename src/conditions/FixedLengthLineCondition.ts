@@ -28,4 +28,8 @@ export class FixedLengthLineCondition extends LineCondition {
   public duplicateForNewLine(line: Line, polygon: Polygon) {
     return new FixedLengthLineCondition(line, polygon, this.fixedLength);
   }
+
+  public verifyCanBeApplied() {
+    return;
+  }
 }

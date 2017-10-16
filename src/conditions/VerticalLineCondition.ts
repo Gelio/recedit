@@ -22,6 +22,14 @@ export class VerticalLineCondition extends LineCondition {
     return new VerticalLineCondition(line, polygon);
   }
 
+  public verifyCanBeApplied() {
+    const angle = Point.getAngle(this.line.p1, this.line.p2);
+
+    if (angle < 60 || angle > 330 || (angle > 120 && angle < 180)) {
+      throw new Error('Line is not vertical enough');
+    }
+  }
+
   private alignPointsVertically(subject: Point, destination: Point) {
     subject.moveTo(new Point(destination.x, subject.y));
   }

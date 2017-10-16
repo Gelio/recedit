@@ -22,6 +22,14 @@ export class HorizontalLineCondition extends LineCondition {
     return new HorizontalLineCondition(line, polygon);
   }
 
+  public verifyCanBeApplied() {
+    const angle = Point.getAngle(this.line.p1, this.line.p2);
+
+    if ((angle > 30 && angle < 150) || (angle > 210 && angle < 330)) {
+      throw new Error('Line is not horizontal enough');
+    }
+  }
+
   private alignPointsHorizontally(subject: Point, destination: Point) {
     subject.moveTo(new Point(subject.x, destination.y));
   }
