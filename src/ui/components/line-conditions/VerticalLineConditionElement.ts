@@ -22,6 +22,7 @@ export class VerticalLineConditionElement extends HTMLElement {
 
   public connectedCallback() {
     this.appendChild(this.button);
+    this.updateButton();
   }
 
   public disconnectedCallback() {
@@ -43,6 +44,21 @@ export class VerticalLineConditionElement extends HTMLElement {
     this.dispatchEvent(
       new CustomEvent(LEX.NEW_CONDITION_EVENT_NAME, { bubbles: true, detail: condition })
     );
+    this.updateButton();
+  }
+
+  private updateButton() {
+    if (!this.selectedTarget.line || !this.selectedTarget.polygon) {
+      return;
+    }
+    const polygon = this.selectedTarget.polygon;
+    const line = this.selectedTarget.line;
+
+    const lineConditions = polygon.getLineConditions();
+    const matchingConditions = lineConditions
+      .filter(lineCondition => lineCondition.line.equals(line));
+
+    this.button.disabled = matchingConditions.length > 0;
   }
 }
 
