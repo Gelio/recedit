@@ -15,6 +15,7 @@ const COMPONENT_CLASS_NAME = 'application-ui__vertex';
 const INITIAL_CLASS_NAME = 'application-ui__vertex--initial';
 
 interface PathPointComponentDependencies {
+  applicationUIContainer: HTMLElement;
   mousePositionTransformer: MousePositionTransformer;
   eventAggregator: EventAggregator;
 }
@@ -23,22 +24,22 @@ export class PathPointComponent {
   public element: HTMLDivElement;
   public path: Path;
   public point: Point;
-  private container: HTMLElement;
+  private readonly applicationUIContainer: HTMLElement;
   private readonly mousePositionTransformer: MousePositionTransformer;
   private readonly eventAggregator: EventAggregator;
 
   constructor(
-    container: HTMLElement,
     path: Path,
     point: Point,
     dependencies: PathPointComponentDependencies
   ) {
-    this.container = container;
     this.path = path;
     this.point = point;
+    this.applicationUIContainer = dependencies.applicationUIContainer;
     this.mousePositionTransformer = dependencies.mousePositionTransformer;
     this.eventAggregator = dependencies.eventAggregator;
 
+    this.updatePosition = this.updatePosition.bind(this);
     this.onMouseDown = this.onMouseDown.bind(this);
     this.onMouseMove = this.onMouseMove.bind(this);
     this.stopDragging = this.stopDragging.bind(this);
@@ -46,11 +47,13 @@ export class PathPointComponent {
   }
 
   public remove() {
+    this.point.moveCallback = null;
     this.element.removeEventListener('mousedown', this.onMouseDown);
     this.element.remove();
   }
 
   public updatePosition() {
+    console.log('Updating position', this.point);
     this.element.style.backgroundColor = this.path.lineProperties.color.fillStyle;
     this.element.style.top = `${this.point.y}px`;
     this.element.style.left = `${this.point.x}px`;
@@ -70,7 +73,7 @@ export class PathPointComponent {
 
   private init() {
     this.element = document.createElement('div');
-    this.container.appendChild(this.element);
+    this.applicationUIContainer.appendChild(this.element);
 
     this.element.classList.add(COMPONENT_CLASS_NAME);
     this.updatePosition();
@@ -83,6 +86,7 @@ export class PathPointComponent {
     }
 
     this.element.addEventListener('mousedown', this.onMouseDown);
+    this.point.moveCallback = this.updatePosition;
   }
 
   private onMouseDown() {
