@@ -54,7 +54,7 @@ export class Polygon extends Path {
   }
 
   public removeVertex(point: Point) {
-    if (this.getVerticesCount() === 3) {
+    if (this.getVerticesCount() === configuration.minPolygonPoints) {
       throw new Error('Cannot delete vertex');
     }
 
