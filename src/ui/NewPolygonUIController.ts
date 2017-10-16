@@ -7,6 +7,7 @@ import { LEX } from 'LEX';
 import { Renderer } from 'Renderer';
 import { Stage } from 'Stage';
 import { MousePositionTransformer } from 'ui/MousePositionTransformer';
+import { UIService } from 'ui/UIService';
 
 import { EventAggregator } from 'events/EventAggregator';
 import { PointClickEvent } from 'events/PointClickEvent';
@@ -23,7 +24,7 @@ interface NewPolygonUIControllerDependencies {
   eventAggregator: EventAggregator;
 }
 
-export class NewPolygonUIController {
+export class NewPolygonUIController implements UIService {
   private readonly applicationUIContainer: HTMLElement;
   private readonly canvas: HTMLCanvasElement;
   private readonly stage: Stage;
