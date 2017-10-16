@@ -1,4 +1,3 @@
-import { HitTestResult } from 'common/HitTestResult';
 import { configuration } from 'configuration';
 import { LEX } from 'LEX';
 import { Renderer } from 'Renderer';
@@ -7,12 +6,12 @@ import { Stage } from 'Stage';
 import { MousePositionTransformer } from 'ui/MousePositionTransformer';
 import { NewPolygonUIController } from 'ui/NewPolygonUIController';
 import { PointDraggingService } from 'ui/PointDraggingService';
+import { PointInserterService } from 'ui/PointInserterService';
 import { PointRemoverService } from 'ui/PointRemoverService';
 import { PointSyncService } from 'ui/PointSyncService';
 
 import { EventAggregator } from 'events/EventAggregator';
-import { RenderEvent } from 'events/RenderEvent';
-import { SyncComponentsEvent } from 'events/ui/SyncComponentsEvent';
+import { LineClickEvent } from 'events/LineClickEvent';
 
 interface UIControllerDependencies {
   canvas: HTMLCanvasElement;
@@ -33,8 +32,7 @@ export class UIController {
   private pointSyncService: PointSyncService;
   private pointRemoverService: PointRemoverService;
   private pointDraggingService: PointDraggingService;
-  private previousHitTestResult: HitTestResult | null = null;
-  private previousHitTestTimestamp: number = 0;
+  private pointInserterService: PointInserterService;
 
   constructor(dependencies: UIControllerDependencies) {
     this.canvas = dependencies.canvas;
@@ -84,6 +82,11 @@ export class UIController {
     });
     this.newPolygonUIController.init();
 
+    this.pointInserterService = new PointInserterService({
+      eventAggregator: this.eventAggregator
+    });
+    this.pointInserterService.init();
+
     this.canvas.addEventListener('click', this.onClick);
   }
 
@@ -93,41 +96,22 @@ export class UIController {
     this.newPolygonUIController.destroy();
     this.pointRemoverService.destroy();
     this.pointDraggingService.destroy();
+    this.pointInserterService.destroy();
   }
 
   private onClick(event: MouseEvent) {
     const point = this.mousePositionTransformer.getPointFromMouseEvent(event);
 
     const hitTestResult = this.stage.hitTest(point);
-    const previousHitTestResult = this.previousHitTestResult;
-    const previousHitTestTimestamp = this.previousHitTestTimestamp;
-    this.previousHitTestResult = hitTestResult;
-    this.previousHitTestTimestamp = Date.now();
 
     if (!hitTestResult) {
       return this.newPolygonUIController.addNewPoint(point);
     }
 
-    console.log('Hit test result', hitTestResult);
-
-    if (
-      !previousHitTestResult ||
-      Date.now() - previousHitTestTimestamp > configuration.doubleClickMaxDelay
-    ) {
+    if (!hitTestResult.path) {
       return;
     }
 
-    if (previousHitTestResult.line.equals(hitTestResult.line)) {
-      if (!hitTestResult.path) {
-        return;
-      }
-
-      const index = hitTestResult.path.findPointIndex(hitTestResult.line.p2);
-      const newPoint = hitTestResult.line.getMiddlePoint();
-
-      hitTestResult.path.insertVertex(newPoint, index);
-      this.eventAggregator.dispatchEvent(new RenderEvent());
-      this.eventAggregator.dispatchEvent(new SyncComponentsEvent());
-    }
+    this.eventAggregator.dispatchEvent(new LineClickEvent(hitTestResult.line, hitTestResult.path, point));
   }
 }
