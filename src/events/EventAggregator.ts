@@ -1,9 +1,12 @@
 import { AppEvent } from 'events/AppEvent';
+import { EventQueue } from 'events/EventQueue';
 
 type EventListener = (event: AppEvent) => void;
 
 export class EventAggregator {
-  private listenerMap = new Map<string, EventListener[]>();
+  private readonly listenerMap = new Map<string, EventListener[]>();
+  private readonly eventQueue = new EventQueue();
+  private isDispatching = false;
 
   public addEventListener(eventType: string, listener: EventListener) {
     const eventListeners = this.getEventListeners(eventType);
@@ -27,8 +30,25 @@ export class EventAggregator {
   }
 
   public dispatchEvent(event: AppEvent) {
+    this.eventQueue.enqueue(event);
+
+    if (!this.isDispatching) {
+      this.dispatchEventFromQueue();
+    }
+  }
+
+  private dispatchEventFromQueue() {
+    this.isDispatching = true;
+
+    const event = this.eventQueue.dequeue();
     const eventListeners = this.getEventListeners(event.eventType);
     eventListeners.forEach(listener => listener(event));
+
+    if (this.eventQueue.isEmpty()) {
+      this.isDispatching = false;
+    } else {
+      this.dispatchEventFromQueue();
+    }
   }
 
   private getEventListeners(eventType: string) {
