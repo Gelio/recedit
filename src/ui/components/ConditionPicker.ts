@@ -2,7 +2,10 @@ import { FixedLengthConditionElement } from 'ui/components/line-conditions/Fixed
 import { HorizontalLineConditionElement } from 'ui/components/line-conditions/HorizontalLineConditionElement';
 import { VerticalLineConditionElement } from 'ui/components/line-conditions/VerticalLineConditionElement';
 
-import { LineConditionElementDependencies, SelectedTarget } from 'ui/components/line-conditions/LineConditionElementDependencies';
+import {
+  LineConditionElementDependencies,
+  SelectedTarget
+} from 'ui/components/line-conditions/LineConditionElementDependencies';
 
 import { Line } from 'common/Line';
 import { Polygon } from 'common/Polygon';
@@ -57,14 +60,22 @@ export class ConditionPicker extends HTMLElement {
   }
 
   public attributeChangedCallback(attributeName: string, _oldValue: string, newValue: string) {
-    if (attributeName === 'data-x' || attributeName === 'data-y') {
-      this.updatePosition();
-    } else if (attributeName === 'data-visible') {
-      if (newValue === 'true') {
-        this.style.display = 'flex';
-      } else {
-        this.style.display = 'none';
-      }
+    switch (attributeName) {
+      case 'data-x':
+      case 'data-y':
+        this.updatePosition();
+        break;
+
+      case 'data-visible':
+        if (newValue === 'true') {
+          this.style.display = 'flex';
+        } else {
+          this.style.display = 'none';
+        }
+        break;
+
+      default:
+        break;
     }
   }
 
