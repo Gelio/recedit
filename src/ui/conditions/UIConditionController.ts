@@ -2,6 +2,7 @@ import { ConditionPicker } from 'ui/components/ConditionPicker';
 import { UIService } from 'ui/UIService';
 
 import { Polygon } from 'common/Polygon';
+import { configuration } from 'configuration';
 import { EventAggregator } from 'events/EventAggregator';
 import { LineClickEvent } from 'events/LineClickEvent';
 import { LEX } from 'LEX';
@@ -16,6 +17,7 @@ export class UIConditionController implements UIService {
   private readonly applicationUIContainer: HTMLElement;
 
   private readonly conditionPicker: ConditionPicker = new ConditionPicker();
+  private previousLineClickTimestamp = 0;
 
   constructor(dependencies: UIConditionControllerDependencies) {
     this.eventAggregator = dependencies.eventAggregator;
@@ -39,6 +41,14 @@ export class UIConditionController implements UIService {
   private onLineClick(event: LineClickEvent) {
     if (!(event.payload.path instanceof Polygon)) {
       return;
+    }
+
+    const previousClickTimestamp = this.previousLineClickTimestamp;
+    const currentTimestamp = Date.now();
+    this.previousLineClickTimestamp = currentTimestamp;
+
+    if (currentTimestamp - previousClickTimestamp <= configuration.doubleClickMaxDelay) {
+      return this.conditionPicker.setAttribute('data-visible', 'false');
     }
 
     this.conditionPicker.setAttribute('data-x', event.payload.position.x.toString());

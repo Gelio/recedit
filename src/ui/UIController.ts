@@ -72,6 +72,8 @@ export class UIController {
   }
 
   private onClick(event: MouseEvent) {
+    event.stopPropagation();
+
     const point = this.mousePositionTransformer.getPointFromMouseEvent(event);
 
     const hitTestResult = this.stage.hitTest(point);
