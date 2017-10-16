@@ -62,10 +62,7 @@ export class PointRemoverService {
     try {
       path.removeVertex(point);
     } catch (error) {
-      alert('Cannot remove vertex');
-      console.error(error);
-
-      return;
+      return alert('Cannot remove vertex');
     }
 
     this.previousPathPointComponent.remove();

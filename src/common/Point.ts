@@ -112,10 +112,8 @@ export class Point {
   private moveToCoordinates(x: number, y: number) {
     this._x = x;
     this._y = y;
-    console.log('Point moved to', this.x, this.y);
 
     if (this.moveCallback) {
-      console.log('Invoking move callback');
       this.moveCallback();
     }
   }

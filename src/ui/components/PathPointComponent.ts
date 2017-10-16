@@ -53,7 +53,6 @@ export class PathPointComponent {
   }
 
   public updatePosition() {
-    console.log('Updating position', this.point);
     this.element.style.backgroundColor = this.path.lineProperties.color.fillStyle;
     this.element.style.top = `${this.point.y}px`;
     this.element.style.left = `${this.point.x}px`;
