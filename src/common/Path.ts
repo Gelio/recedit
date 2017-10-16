@@ -94,7 +94,7 @@ export class Path {
   }
 
   public clone(): Path {
-    const vertices = [...this.getVertices()];
+    const vertices = [...this.getVertices().map(point => point.clone())];
     const lineProperties = this.lineProperties.clone();
 
     return new Path(vertices, lineProperties);
