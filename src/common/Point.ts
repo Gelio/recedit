@@ -105,6 +105,10 @@ export class Point {
     return Point.getDistanceBetweenSquared(this, point);
   }
 
+  public clone() {
+    return new Point(this.x, this.y);
+  }
+
   private moveToPoint(point: Point) {
     return this.moveToCoordinates(point.x, point.y);
   }
