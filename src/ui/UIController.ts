@@ -3,6 +3,7 @@ import { LEX } from 'LEX';
 import { Renderer } from 'Renderer';
 import { Stage } from 'Stage';
 
+import { UIConditionController } from 'ui/conditions/UIConditionController';
 import { MousePositionTransformer } from 'ui/MousePositionTransformer';
 import { NewPolygonUIController } from 'ui/NewPolygonUIController';
 import { PointDraggingService } from 'ui/PointDraggingService';
@@ -58,6 +59,7 @@ export class UIController {
     this.createPointInserterService();
     this.createPointRemoverService();
     this.createPointSyncService();
+    this.createUIConditionController();
 
     this.uiServices.forEach(uiService => uiService.init());
   }
@@ -82,6 +84,7 @@ export class UIController {
       return;
     }
 
+    event.stopPropagation();
     this.eventAggregator.dispatchEvent(new LineClickEvent(hitTestResult.line, hitTestResult.path, point));
   }
 
@@ -133,5 +136,14 @@ export class UIController {
     });
 
     this.uiServices.push(pointInserterService);
+  }
+
+  private createUIConditionController() {
+    const uiConditionController = new UIConditionController({
+      eventAggregator: this.eventAggregator,
+      applicationUIContainer: this.applicationUIContainer
+    });
+
+    this.uiServices.push(uiConditionController);
   }
 }
