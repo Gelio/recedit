@@ -6,7 +6,7 @@ import {
 } from 'ui/components/line-conditions/LineConditionElementDependencies';
 
 export class HorizontalLineConditionElement extends HTMLElement {
-  private readonly button: HTMLElement;
+  private readonly button: HTMLButtonElement;
 
   private readonly selectedTarget: SelectedTarget;
 
@@ -15,11 +15,9 @@ export class HorizontalLineConditionElement extends HTMLElement {
 
     this.selectedTarget = dependencies.selectedTarget;
 
-    const button = document.createElement('button');
-    button.textContent = 'Horizontal';
-    button.addEventListener('click', this.onButtonClick.bind(this));
-
-    this.button = button;
+    this.button = document.createElement('button');
+    this.button.textContent = 'Horizontal';
+    this.button.addEventListener('click', this.onButtonClick.bind(this));
   }
 
   public connectedCallback() {

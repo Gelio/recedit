@@ -6,7 +6,7 @@ import {
 } from 'ui/components/line-conditions/LineConditionElementDependencies';
 
 export class VerticalLineConditionElement extends HTMLElement {
-  private readonly button: HTMLElement;
+  private readonly button: HTMLButtonElement;
 
   private readonly selectedTarget: SelectedTarget;
 
@@ -15,11 +15,9 @@ export class VerticalLineConditionElement extends HTMLElement {
 
     this.selectedTarget = dependencies.selectedTarget;
 
-    const button = document.createElement('button');
-    button.textContent = 'Vertical';
-    button.addEventListener('click', this.onButtonClick.bind(this));
-
-    this.button = button;
+    this.button = document.createElement('button');
+    this.button.textContent = 'Vertical';
+    this.button.addEventListener('click', this.onButtonClick.bind(this));
   }
 
   public connectedCallback() {

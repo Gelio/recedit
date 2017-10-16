@@ -6,7 +6,7 @@ import {
 } from 'ui/components/line-conditions/LineConditionElementDependencies';
 
 export class FixedLengthConditionElement extends HTMLElement {
-  private readonly button: HTMLElement;
+  private readonly button: HTMLButtonElement;
   private readonly selectedTarget: SelectedTarget;
 
   constructor(dependencies: LineConditionElementDependencies) {
@@ -14,11 +14,9 @@ export class FixedLengthConditionElement extends HTMLElement {
 
     this.selectedTarget = dependencies.selectedTarget;
 
-    const button = document.createElement('button');
-    button.textContent = 'Fixed length';
-    button.addEventListener('click', this.onButtonClick.bind(this));
-
-    this.button = button;
+    this.button = document.createElement('button');
+    this.button.textContent = 'Fixed length';
+    this.button.addEventListener('click', this.onButtonClick.bind(this));
   }
 
   public connectedCallback() {
