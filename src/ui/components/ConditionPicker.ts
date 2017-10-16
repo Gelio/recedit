@@ -2,6 +2,7 @@ import { FixedLengthConditionElement } from 'ui/components/line-conditions/Fixed
 import { HorizontalLineConditionElement } from 'ui/components/line-conditions/HorizontalLineConditionElement';
 import { VerticalLineConditionElement } from 'ui/components/line-conditions/VerticalLineConditionElement';
 
+import { LineConditionElement } from 'ui/components/line-conditions/LineConditionElement';
 import {
   LineConditionElementDependencies,
   SelectedTarget
@@ -17,7 +18,7 @@ export class ConditionPicker extends HTMLElement {
     line: null,
     polygon: null
   };
-
+  private readonly lineConditionElements: LineConditionElement[];
   private readonly conditionElementsContainer: HTMLDivElement;
   private readonly closeButton: HTMLButtonElement;
 
@@ -26,15 +27,15 @@ export class ConditionPicker extends HTMLElement {
     this.onMouseDown = this.onMouseDown.bind(this);
     this.hide = this.hide.bind(this);
 
-    const lineConditionElements = this.createLineConditionElements();
-
     this.closeButton = document.createElement('button');
     this.closeButton.className = 'condition-picker__close-button';
     this.closeButton.textContent = 'X';
 
     this.conditionElementsContainer = document.createElement('div');
     this.conditionElementsContainer.className = 'condition-elements-container';
-    lineConditionElements.forEach(element => this.conditionElementsContainer.appendChild(element));
+
+    this.lineConditionElements = this.createLineConditionElements();
+    this.lineConditionElements.forEach(element => this.conditionElementsContainer.appendChild(element));
 
     this.updatePosition();
   }
@@ -82,6 +83,8 @@ export class ConditionPicker extends HTMLElement {
   public updateSelectedLine(line: Line, polygon: Polygon) {
     this.selectedTarget.line = line;
     this.selectedTarget.polygon = polygon;
+
+    this.lineConditionElements.forEach(element => element.updateButton());
   }
 
   private updatePosition() {
