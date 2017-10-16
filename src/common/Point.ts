@@ -1,12 +1,24 @@
 import { Octant } from 'common/Octant';
 
+type MoveCallback = () => void;
+
 export class Point {
-  public readonly x: number;
-  public readonly y: number;
+  public moveCallback: MoveCallback | null = null;
+
+  private _x: number;
+  private _y: number;
+
+  public get x() {
+    return this._x;
+  }
+
+  public get y() {
+    return this._y;
+  }
 
   constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
+    this._x = x;
+    this._y = y;
   }
 
   public static add(p1: Point, p2: Point): Point {
@@ -23,6 +35,20 @@ export class Point {
 
   public static getDistanceBetweenSquared(p1: Point, p2: Point): number {
     return Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2);
+  }
+
+  public moveTo(point: Point): void;
+  public moveTo(x: number, y: number): void;
+  public moveTo(pointOrX: Point | number, y?: number) {
+    if (typeof pointOrX === 'number') {
+      if (!y) {
+        throw new Error('x is defined, but y is not defined');
+      }
+
+      return this.moveToCoordinates(pointOrX, y);
+    }
+
+    return this.moveToPoint(pointOrX);
   }
 
   public getOctant(): Octant {
@@ -77,5 +103,20 @@ export class Point {
 
   public getDistanceSquaredTo(point: Point): number {
     return Point.getDistanceBetweenSquared(this, point);
+  }
+
+  private moveToPoint(point: Point) {
+    return this.moveToCoordinates(point.x, point.y);
+  }
+
+  private moveToCoordinates(x: number, y: number) {
+    this._x = x;
+    this._y = y;
+    console.log('Point moved to', this.x, this.y);
+
+    if (this.moveCallback) {
+      console.log('Invoking move callback');
+      this.moveCallback();
+    }
   }
 }
