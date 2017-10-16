@@ -22,6 +22,7 @@ export class FixedLengthLineCondition extends LineCondition {
   }
 
   public fix(_lockedPoint: Point) {
+    // TODO: implement this
     throw new Error('Not implemented');
   }
 

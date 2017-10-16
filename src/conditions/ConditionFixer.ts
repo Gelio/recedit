@@ -10,10 +10,10 @@ export class ConditionFixer {
 
   private _fixSuccessful?: boolean;
 
-  constructor(polygon: Polygon, startingPoint: Point, additionalLineConditions?: LineCondition[]) {
+  constructor(polygon: Polygon, startingPoint: Point, additionalLineConditions: LineCondition[] = []) {
     this.polygon = polygon;
     this.startingPoint = startingPoint;
-    this.additionalLineConditions = additionalLineConditions || [];
+    this.additionalLineConditions = additionalLineConditions;
   }
 
   public get fixSuccessful(): boolean {

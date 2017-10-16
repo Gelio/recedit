@@ -25,6 +25,7 @@
       "check-format",
       "allow-leading-underscore",
       "ban-keywords"
-    ]
+    ],
+    "no-suspicious-comment": false
   }
 }

@@ -2,11 +2,14 @@ import { COLORS } from 'common/COLORS';
 import { Layer } from 'common/Layer';
 import { LineProperties } from 'common/LineProperties';
 import { Point } from 'common/Point';
+import { Polygon } from 'common/Polygon';
 import { configuration } from 'configuration';
 import { EventAggregator } from 'events/EventAggregator';
 import { LEX } from 'LEX';
 import { Stage } from 'Stage';
 import { UIService } from 'ui/UIService';
+
+import { ContinuousConditionFixer } from 'conditions/ContinuousConditionFixer';
 
 import { FinishPointDragEvent } from 'events/point-drag/FinishPointDragEvent';
 import { PointDragEvent } from 'events/point-drag/PointDragEvent';
@@ -23,6 +26,7 @@ export class PointDraggingService implements UIService {
   private readonly eventAggregator: EventAggregator;
   private readonly stage: Stage;
   private pathGhostLayer: Layer;
+  private continuousConditionFixer: ContinuousConditionFixer | null;
 
   constructor(dependencies: PointDraggingServiceDependencies) {
     this.eventAggregator = dependencies.eventAggregator;
@@ -56,6 +60,11 @@ export class PointDraggingService implements UIService {
 
   private onStartPointDrag(event: StartPointDragEvent) {
     event.handled = true;
+
+    if (event.payload.path instanceof Polygon) {
+      this.continuousConditionFixer = new ContinuousConditionFixer(event.payload.path, event.payload.point);
+    }
+
     if (!configuration.displayPathGhostWhenDragging) {
       return;
     }
@@ -70,6 +79,7 @@ export class PointDraggingService implements UIService {
 
   private onFinishPointDrag(event: FinishPointDragEvent) {
     event.handled = true;
+    this.continuousConditionFixer = null;
     if (!configuration.displayPathGhostWhenDragging) {
       return;
     }
@@ -82,6 +92,10 @@ export class PointDraggingService implements UIService {
 
   private onPointDrag(event: PointDragEvent) {
     const { component, newPosition } = event.payload;
+
+    if (this.continuousConditionFixer) {
+      this.continuousConditionFixer.fix();
+    }
 
     if (configuration.pointWiggleWhenDragging) {
       component.path
