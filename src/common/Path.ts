@@ -85,14 +85,6 @@ export class Path {
     this.vertices.splice(index, 0, point);
   }
 
-  public movePoint(point: Point, newPosition: Point) {
-    const index = this.findPointIndex(point);
-
-    if (index !== -1) {
-      this.vertices.splice(index, 1, newPosition);
-    }
-  }
-
   public clone(): Path {
     const vertices = [...this.getVertices().map(point => point.clone())];
     const lineProperties = this.lineProperties.clone();
@@ -101,6 +93,6 @@ export class Path {
   }
 
   public findPointIndex(point: Point) {
-    return this.vertices.findIndex(otherPoint => otherPoint.equals(point));
+    return this.vertices.indexOf(point);
   }
 }
