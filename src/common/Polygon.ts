@@ -1,9 +1,14 @@
+import { Line } from 'common/Line';
 import { LineProperties } from 'common/LineProperties';
 import { Path } from 'common/Path';
 import { Point } from 'common/Point';
 import { configuration } from 'configuration';
 
+import { LineCondition } from 'conditions/LineCondition';
+
 export class Polygon extends Path {
+  private lineConditions: LineCondition[];
+
   constructor(path: Path);
   constructor(vertices: Point[], lineProperties: LineProperties);
 
@@ -22,6 +27,7 @@ export class Polygon extends Path {
     Polygon.ensureVerticesLength(vertices);
     super(vertices, lineProperties);
     this.closed = true;
+    this.lineConditions = [];
   }
 
   private static ensureVerticesLength(vertices: Point[]) {
@@ -33,7 +39,20 @@ export class Polygon extends Path {
   }
 
   public clone(): Polygon {
-    return new Polygon(super.clone());
+    const polygon = new Polygon(super.clone());
+
+    this.lineConditions.forEach(lineCondition => {
+      const p1Index = this.findPointIndex(lineCondition.line.p1);
+      const p2Index = this.findPointIndex(lineCondition.line.p2);
+
+      const newLineCondition = lineCondition.duplicateForNewLine(
+        new Line(polygon.vertices[p1Index], polygon.vertices[p2Index]),
+        polygon
+      );
+      polygon.lineConditions.push(newLineCondition);
+    });
+
+    return polygon;
   }
 
   public getNextPoint(point: Point) {
@@ -59,5 +78,37 @@ export class Polygon extends Path {
     }
 
     super.removeVertex(point);
+  }
+
+  public addLineCondition(lineCondition: LineCondition) {
+    if (lineCondition.polygon !== this) {
+      throw new Error('Line condition bound to wrong polygon');
+    }
+
+    const p1Index = this.findPointIndex(lineCondition.line.p1);
+    const p2Index = this.findPointIndex(lineCondition.line.p2);
+    if (p1Index === -1 || p2Index === -2) {
+      throw new Error('Line condition bound to wrong line');
+    }
+
+    if (!lineCondition.isMet()) {
+      throw new Error('Line condition is not met');
+    }
+
+    this.lineConditions.push(lineCondition);
+  }
+
+  public removeLineCondition(lineCondition: LineCondition) {
+    const index = this.lineConditions.indexOf(lineCondition);
+
+    if (index === -1) {
+      throw new Error('Line condition not found');
+    }
+
+    this.lineConditions.splice(index, 1);
+  }
+
+  public getLineConditions() {
+    return [...this.lineConditions];
   }
 }
