@@ -1,11 +1,18 @@
 import { ConditionPicker } from 'ui/components/ConditionPicker';
 import { UIService } from 'ui/UIService';
 
+import { Line } from 'common/Line';
 import { Polygon } from 'common/Polygon';
+import { LineCondition } from 'conditions/LineCondition';
 import { configuration } from 'configuration';
 import { EventAggregator } from 'events/EventAggregator';
 import { LineClickEvent } from 'events/LineClickEvent';
 import { LEX } from 'LEX';
+
+import { ConditionFixer } from 'conditions/ConditionFixer';
+
+import { RenderEvent } from 'events/RenderEvent';
+import { SyncComponentsEvent } from 'events/ui/SyncComponentsEvent';
 
 interface UIConditionControllerDependencies {
   eventAggregator: EventAggregator;
@@ -24,12 +31,13 @@ export class UIConditionController implements UIService {
     this.applicationUIContainer = dependencies.applicationUIContainer;
 
     this.onLineClick = this.onLineClick.bind(this);
+    this.onNewCondition = this.onNewCondition.bind(this);
   }
 
   public init() {
     this.eventAggregator.addEventListener(LineClickEvent.eventType, this.onLineClick);
     this.applicationUIContainer.appendChild(this.conditionPicker);
-    this.conditionPicker.addEventListener(LEX.NEW_CONDITION_EVENT_NAME, event => console.log('Custom event', event));
+    this.conditionPicker.addEventListener(LEX.NEW_CONDITION_EVENT_NAME, this.onNewCondition);
     this.conditionPicker.setAttribute('data-visible', 'false');
   }
 
@@ -55,5 +63,38 @@ export class UIConditionController implements UIService {
     this.conditionPicker.setAttribute('data-y', event.payload.position.y.toString());
     this.conditionPicker.updateSelectedLine(event.payload.line, event.payload.path);
     this.conditionPicker.setAttribute('data-visible', 'true');
+  }
+
+  private onNewCondition(event: CustomEvent) {
+    const lineCondition: LineCondition = event.detail;
+
+    if (!lineCondition.isMet()) {
+      const realPolygon = lineCondition.polygon;
+      const p1Index = realPolygon.findPointIndex(lineCondition.line.p1);
+      const p2Index = realPolygon.findPointIndex(lineCondition.line.p2);
+      const polygonClone = realPolygon.clone();
+
+      const conditionFixer = new ConditionFixer(polygonClone, polygonClone.getVertex(p1Index), [
+        lineCondition.duplicateForNewLine(new Line(polygonClone.getVertex(p1Index), polygonClone.getVertex(p2Index)), polygonClone)
+      ]);
+      conditionFixer.tryFix();
+
+      if (!conditionFixer.fixSuccessful) {
+        return console.log('Fix not successful');
+      }
+
+      polygonClone.getVertices().forEach((point, index) => {
+        realPolygon.getVertex(index).moveTo(point);
+      });
+
+      console.log('Forced condition to meet');
+    }
+
+    lineCondition.polygon.addLineCondition(lineCondition);
+    this.eventAggregator.dispatchEvent(new RenderEvent());
+    this.eventAggregator.dispatchEvent(new SyncComponentsEvent());
+
+    console.log('New condition', lineCondition);
+    console.log('Is met:', lineCondition.isMet());
   }
 }

@@ -1,4 +1,5 @@
 import { Line } from 'common/Line';
+import { Point } from 'common/Point';
 import { Polygon } from 'common/Polygon';
 
 export class LineCondition {
@@ -14,7 +15,11 @@ export class LineCondition {
     throw new Error('LineCondition.isMet not implemented');
   }
 
-  public fix() {
+  public fix(_lockedPoint: Point) {
     throw new Error('LineCondition.fix not implemented');
+  }
+
+  public duplicateForNewLine(_line: Line, _polygon: Polygon): LineCondition {
+    throw new Error('Not implemented');
   }
 }
