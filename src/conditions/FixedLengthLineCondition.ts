@@ -5,11 +5,13 @@ import { Point } from 'common/Point';
 import { Polygon } from 'common/Polygon';
 
 export class FixedLengthLineCondition extends LineCondition {
+  private readonly fixedLength: number;
   private readonly fixedLengthSquared: number;
 
   constructor(line: Line, polygon: Polygon, length: number) {
     super(line, polygon);
 
+    this.fixedLength = length;
     this.fixedLengthSquared = Math.pow(length, 2);
   }
 
