@@ -47,7 +47,11 @@ export class LineConditionElement extends HTMLElement {
     const otherConditions = this.getOtherTargetConditions(targetConditions);
 
     if (targetConditions.length - otherConditions.length === 1) {
-      throw new Error('Removing a condition not implemented yet');
+      const condition = targetConditions[0];
+
+      this.dispatchEvent(
+        new CustomEvent(LEX.REMOVE_CONDITION_EVENT_NAME, { bubbles: true, detail: condition })
+      );
     } else {
       const condition = this.createNewCondition();
       if (!condition) {
@@ -69,9 +73,7 @@ export class LineConditionElement extends HTMLElement {
     const line = this.selectedTarget.line;
     const lineConditions = polygon.getLineConditions();
 
-    return lineConditions.filter(lineCondition =>
-      lineCondition.line.equals(line)
-    );
+    return lineConditions.filter(lineCondition => lineCondition.line.equals(line));
   }
 
   private getOtherTargetConditions(targetConditions: LineCondition[]) {

@@ -32,17 +32,24 @@ export class UIConditionController implements UIService {
 
     this.onLineClick = this.onLineClick.bind(this);
     this.onNewCondition = this.onNewCondition.bind(this);
+    this.onRemoveCondition = this.onRemoveCondition.bind(this);
   }
 
   public init() {
     this.eventAggregator.addEventListener(LineClickEvent.eventType, this.onLineClick);
     this.applicationUIContainer.appendChild(this.conditionPicker);
     this.conditionPicker.addEventListener(LEX.NEW_CONDITION_EVENT_NAME, this.onNewCondition);
+    this.conditionPicker.addEventListener(LEX.REMOVE_CONDITION_EVENT_NAME, this.onRemoveCondition);
     this.conditionPicker.setAttribute('data-visible', 'false');
   }
 
   public destroy() {
     this.eventAggregator.removeEventListener(LineClickEvent.eventType, this.onLineClick);
+    this.conditionPicker.removeEventListener(LEX.NEW_CONDITION_EVENT_NAME, this.onNewCondition);
+    this.conditionPicker.removeEventListener(
+      LEX.REMOVE_CONDITION_EVENT_NAME,
+      this.onRemoveCondition
+    );
     this.applicationUIContainer.removeChild(this.conditionPicker);
   }
 
@@ -75,7 +82,10 @@ export class UIConditionController implements UIService {
       const polygonClone = realPolygon.clone();
 
       const conditionFixer = new ConditionFixer(polygonClone, polygonClone.getVertex(p1Index), [
-        lineCondition.duplicateForNewLine(new Line(polygonClone.getVertex(p1Index), polygonClone.getVertex(p2Index)), polygonClone)
+        lineCondition.duplicateForNewLine(
+          new Line(polygonClone.getVertex(p1Index), polygonClone.getVertex(p2Index)),
+          polygonClone
+        )
       ]);
       conditionFixer.tryFix();
 
@@ -97,5 +107,12 @@ export class UIConditionController implements UIService {
 
     console.log('New condition', lineCondition);
     console.log('Is met:', lineCondition.isMet());
+  }
+
+  private onRemoveCondition(event: CustomEvent) {
+    const lineCondition: LineCondition = event.detail;
+
+    lineCondition.polygon.removeLineCondition(lineCondition);
+    this.conditionPicker.updateButtons();
   }
 }
