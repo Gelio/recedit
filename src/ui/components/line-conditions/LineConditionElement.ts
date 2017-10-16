@@ -14,7 +14,6 @@ export class LineConditionElement extends HTMLElement {
     this.selectedTarget = dependencies.selectedTarget;
 
     this.button = document.createElement('button');
-    this.button.textContent = 'Fixed length';
     this.button.addEventListener('click', this.onButtonClick.bind(this));
   }
 
