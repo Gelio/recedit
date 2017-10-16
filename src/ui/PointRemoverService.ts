@@ -1,4 +1,5 @@
 import { configuration } from 'configuration';
+import { UIService } from 'ui/UIService';
 
 import { EventAggregator } from 'events/EventAggregator';
 import { PointClickEvent } from 'events/PointClickEvent';
@@ -10,7 +11,7 @@ interface PointRemoverServiceDependencies {
   eventAggregator: EventAggregator;
 }
 
-export class PointRemoverService {
+export class PointRemoverService implements UIService {
   private readonly eventAggregator: EventAggregator;
 
   private previousPathPointComponent: PathPointComponent;

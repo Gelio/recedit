@@ -5,12 +5,13 @@ import { SyncComponentsEvent } from 'events/ui/SyncComponentsEvent';
 
 import { Line } from 'common/Line';
 import { configuration } from 'configuration';
+import { UIService } from 'ui/UIService';
 
 interface PointInserterServiceDependencies {
   eventAggregator: EventAggregator;
 }
 
-export class PointInserterService {
+export class PointInserterService implements UIService {
   private readonly eventAggregator: EventAggregator;
 
   private previousLineClickTimestamp = 0;

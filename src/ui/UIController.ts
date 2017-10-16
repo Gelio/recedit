@@ -9,6 +9,7 @@ import { PointDraggingService } from 'ui/PointDraggingService';
 import { PointInserterService } from 'ui/PointInserterService';
 import { PointRemoverService } from 'ui/PointRemoverService';
 import { PointSyncService } from 'ui/PointSyncService';
+import { UIService } from 'ui/UIService';
 
 import { EventAggregator } from 'events/EventAggregator';
 import { LineClickEvent } from 'events/LineClickEvent';
@@ -28,11 +29,9 @@ export class UIController {
 
   private mousePositionTransformer: MousePositionTransformer;
   private applicationUIContainer: HTMLElement;
+
+  private uiServices: UIService[] = [];
   private newPolygonUIController: NewPolygonUIController;
-  private pointSyncService: PointSyncService;
-  private pointRemoverService: PointRemoverService;
-  private pointDraggingService: PointDraggingService;
-  private pointInserterService: PointInserterService;
 
   constructor(dependencies: UIControllerDependencies) {
     this.canvas = dependencies.canvas;
@@ -52,24 +51,22 @@ export class UIController {
     this.applicationUIContainer = applicationUIContainer;
 
     this.mousePositionTransformer = new MousePositionTransformer(this.canvas);
-    this.pointSyncService = new PointSyncService({
+
+    const pointSyncService = new PointSyncService({
       container: this.applicationUIContainer,
       mousePositionTransformer: this.mousePositionTransformer,
       stage: this.stage,
       eventAggregator: this.eventAggregator
     });
-    this.pointSyncService.init();
 
-    this.pointRemoverService = new PointRemoverService({
+    const pointRemoverService = new PointRemoverService({
       eventAggregator: this.eventAggregator
     });
-    this.pointRemoverService.init();
 
-    this.pointDraggingService = new PointDraggingService({
+    const pointDraggingService = new PointDraggingService({
       eventAggregator: this.eventAggregator,
       stage: this.stage
     });
-    this.pointDraggingService.init();
 
     this.newPolygonUIController = new NewPolygonUIController({
       applicationUIContainer: this.applicationUIContainer,
@@ -80,23 +77,21 @@ export class UIController {
       mousePositionTransformer: this.mousePositionTransformer,
       eventAggregator: this.eventAggregator
     });
-    this.newPolygonUIController.init();
 
-    this.pointInserterService = new PointInserterService({
+    const pointInserterService = new PointInserterService({
       eventAggregator: this.eventAggregator
     });
-    this.pointInserterService.init();
+
+    this.uiServices.push(pointSyncService, pointRemoverService, pointDraggingService, this.newPolygonUIController, pointInserterService);
+    this.uiServices.forEach(uiService => uiService.init());
 
     this.canvas.addEventListener('click', this.onClick);
   }
 
   public destroy() {
     this.canvas.removeEventListener('click', this.onClick);
-    this.pointSyncService.destroy();
-    this.newPolygonUIController.destroy();
-    this.pointRemoverService.destroy();
-    this.pointDraggingService.destroy();
-    this.pointInserterService.destroy();
+
+    this.uiServices.forEach(uiService => uiService.destroy());
   }
 
   private onClick(event: MouseEvent) {
