@@ -48,6 +48,7 @@ export class NewPolygonUIController implements UIService {
     this.closePath = this.closePath.bind(this);
     this.onMouseMove = this.onMouseMove.bind(this);
     this.onPointClick = this.onPointClick.bind(this);
+    this.onKeyDown = this.onKeyDown.bind(this);
   }
 
   public init() {
@@ -55,19 +56,20 @@ export class NewPolygonUIController implements UIService {
     this.startNewUnfinishedPath();
 
     this.canvas.addEventListener('mousemove', this.onMouseMove);
+    window.addEventListener('keydown', this.onKeyDown);
     this.eventAggregator.addEventListener(PointClickEvent.eventType, this.onPointClick);
   }
 
   public destroy() {
     this.canvas.removeEventListener('mousemove', this.onMouseMove);
+    window.removeEventListener('keydown', this.onKeyDown);
     this.eventAggregator.removeEventListener(PointClickEvent.eventType, this.onPointClick);
     this.stage.removeLayer(this.pathLayer);
   }
 
   public addNewPoint(point: Point) {
     this.unfinishedPath.addVertex(point);
-    this.eventAggregator.dispatchEvent(new RenderEvent());
-    this.eventAggregator.dispatchEvent(new SyncComponentsEvent());
+    this.dispatchUpdateUIEvents();
   }
 
   private onMouseMove(event: MouseEvent) {
@@ -114,7 +116,24 @@ export class NewPolygonUIController implements UIService {
     this.pathLayer.removePath(this.unfinishedPath);
 
     this.startNewUnfinishedPath();
+    this.dispatchUpdateUIEvents();
+  }
+
+  private dispatchUpdateUIEvents() {
     this.eventAggregator.dispatchEvent(new RenderEvent());
     this.eventAggregator.dispatchEvent(new SyncComponentsEvent());
+  }
+
+  private onKeyDown(event: KeyboardEvent) {
+    switch (event.keyCode) {
+      case 27:
+        this.pathLayer.removePath(this.unfinishedPath);
+        this.startNewUnfinishedPath();
+        this.dispatchUpdateUIEvents();
+        break;
+
+      default:
+        break;
+    }
   }
 }
