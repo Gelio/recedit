@@ -10,7 +10,8 @@ const configuration = {
   minPolygonPoints: 3,
   doubleClickMaxDelay: 500,
   displayPathGhostWhenDragging: false,
-  epsilon: 10e-4
+  epsilon: 10e-4,
+  lineDeviationAllowanceInDegrees: 20
 };
 
 export {

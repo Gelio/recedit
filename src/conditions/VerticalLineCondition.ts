@@ -2,6 +2,14 @@ import { Line } from 'common/Line';
 import { Point } from 'common/Point';
 import { Polygon } from 'common/Polygon';
 import { LineCondition } from 'conditions/LineCondition';
+import { configuration } from 'configuration';
+
+const maxDeviation = configuration.lineDeviationAllowanceInDegrees;
+
+const allowedDegreeRanges = [
+  [90 - maxDeviation, 90 + maxDeviation],
+  [270 - maxDeviation, 270 + maxDeviation]
+];
 
 export class VerticalLineCondition extends LineCondition {
   public isMet(): boolean {
@@ -25,7 +33,7 @@ export class VerticalLineCondition extends LineCondition {
   public verifyCanBeApplied() {
     const angle = Point.getAngle(this.line.p1, this.line.p2);
 
-    if (angle < 60 || angle > 330 || (angle > 120 && angle < 180)) {
+    if (!allowedDegreeRanges.some(degreeRange => angle >= degreeRange[0] && angle <= degreeRange[1])) {
       throw new Error('Line is not vertical enough');
     }
   }
