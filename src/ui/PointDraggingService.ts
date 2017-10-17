@@ -1,7 +1,6 @@
 import { COLORS } from 'common/COLORS';
 import { Layer } from 'common/Layer';
 import { LineProperties } from 'common/LineProperties';
-import { Point } from 'common/Point';
 import { Polygon } from 'common/Polygon';
 import { configuration } from 'configuration';
 import { EventAggregator } from 'events/EventAggregator';
@@ -93,36 +92,14 @@ export class PointDraggingService implements UIService {
   private onPointDrag(event: PointDragEvent) {
     const { component, newPosition } = event.payload;
 
+    component.point.moveTo(newPosition);
+
     if (this.continuousConditionFixer) {
       this.continuousConditionFixer.fix();
       this.continuousConditionFixer.propagateChangesToOriginalPolygon();
     }
 
-    if (configuration.pointWiggleWhenDragging) {
-      component.path
-        .getVertices()
-        .filter(point => point !== component.point)
-        .forEach(point => point.moveTo(this.getPointPositionAfterWiggle(point)));
-    }
-
-    component.point.moveTo(newPosition);
-
     this.eventAggregator.dispatchEvent(new RenderEvent());
     event.handled = true;
-  }
-
-  private getPointPositionAfterWiggle(point: Point) {
-    const maxTranslation = 5;
-    const translationVertex = new Point(
-      this.getRandomInt(-maxTranslation, maxTranslation),
-      this.getRandomInt(-maxTranslation, maxTranslation)
-    );
-
-    return Point.add(point, translationVertex);
-  }
-
-  private getRandomInt(min: number, max: number) {
-    // tslint:disable-next-line
-    return Math.floor(Math.random() * (max - min + 1) + min);
   }
 }
