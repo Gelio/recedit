@@ -144,4 +144,12 @@ export class Polygon extends Path {
   public getLineConditions() {
     return [...this.lineConditions];
   }
+
+  public moveTo(polygon: Polygon) {
+    if (this.getVerticesCount() !== polygon.getVerticesCount()) {
+      throw new Error('The number of vertices does not match');
+    }
+
+    this.vertices.forEach((point, index) => point.moveTo(polygon.getVertex(index)));
+  }
 }

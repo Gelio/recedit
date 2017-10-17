@@ -9,14 +9,20 @@ export enum FixingDirection {
 }
 
 export class ConditionFixer {
+  public direction: FixingDirection;
+
   private readonly polygon: Polygon;
   private readonly startingPoint: Point;
   private readonly additionalLineConditions: LineCondition[];
-  private readonly direction: FixingDirection;
 
   private _fixSuccessful?: boolean;
 
-  constructor(polygon: Polygon, startingPoint: Point, additionalLineConditions: LineCondition[] = [], direction = FixingDirection.Normal) {
+  constructor(
+    polygon: Polygon,
+    startingPoint: Point,
+    additionalLineConditions: LineCondition[] = [],
+    direction: FixingDirection = FixingDirection.Normal
+  ) {
     this.polygon = polygon;
     this.startingPoint = startingPoint;
     this.additionalLineConditions = additionalLineConditions;
@@ -32,6 +38,10 @@ export class ConditionFixer {
   }
 
   public tryFix() {
+    if (this._fixSuccessful !== undefined) {
+      throw new Error('ConditionFixer needs to be reset before fixing again');
+    }
+
     const points = this.polygon.getVertices();
     const lineConditions = [...this.polygon.getLineConditions(), ...this.additionalLineConditions];
     const startingPointIndex = this.polygon.findPointIndex(this.startingPoint);
@@ -53,6 +63,10 @@ export class ConditionFixer {
     }
 
     this._fixSuccessful = lineConditions.every(lineCondition => lineCondition.isMet());
+  }
+
+  public reset() {
+    this._fixSuccessful = undefined;
   }
 
   private getNextPointIndex(currentPointIndex: number) {
