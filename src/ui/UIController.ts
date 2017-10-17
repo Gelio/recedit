@@ -17,6 +17,9 @@ import { ConditionMatcher } from 'conditions/ConditionMatcher';
 import { EventAggregator } from 'events/EventAggregator';
 import { LineClickEvent } from 'events/LineClickEvent';
 
+import 'ui/components/instructions/InstructionsButton';
+import 'ui/components/instructions/InstructionsDialog';
+
 interface UIControllerDependencies {
   canvas: HTMLCanvasElement;
   renderer: Renderer;
