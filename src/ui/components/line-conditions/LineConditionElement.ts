@@ -5,6 +5,10 @@ import {
   SelectedTarget
 } from 'ui/components/line-conditions/LineConditionElementDependencies';
 
+import 'ui/components/line-conditions/LineConditionElement.scss';
+
+const LINE_CONDITION_ACTIVE_CLASS = 'line-condition--active';
+
 export class LineConditionElement extends HTMLElement {
   protected readonly button: HTMLButtonElement;
   protected readonly selectedTarget: SelectedTarget;
@@ -14,6 +18,7 @@ export class LineConditionElement extends HTMLElement {
     this.selectedTarget = dependencies.selectedTarget;
 
     this.button = document.createElement('button');
+    this.button.className = 'line-condition__button';
     this.button.addEventListener('click', this.onButtonClick.bind(this));
   }
 
@@ -30,6 +35,12 @@ export class LineConditionElement extends HTMLElement {
     const otherConditions = this.getOtherTargetConditions(targetConditions);
 
     this.button.disabled = otherConditions.length > 0;
+
+    if (targetConditions.length - otherConditions.length === 1) {
+      this.classList.add(LINE_CONDITION_ACTIVE_CLASS);
+    } else {
+      this.classList.remove(LINE_CONDITION_ACTIVE_CLASS);
+    }
   }
 
   protected createNewCondition(): LineCondition | null {
