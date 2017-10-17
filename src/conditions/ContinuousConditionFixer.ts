@@ -15,9 +15,6 @@ export class ContinuousConditionFixer {
   private readonly startingPoint: Point;
   private readonly clonedStartingPoint: Point;
 
-  private readonly clonedReversePolygon: Polygon;
-  private readonly clonedReverseStartingPoint: Point;
-
   constructor(polygon: Polygon, startingPoint: Point) {
     // TODO: inject ContinuousFixer constructor
     this.polygon = polygon;
@@ -26,9 +23,6 @@ export class ContinuousConditionFixer {
 
     this.clonedPolygon = polygon.clone();
     this.clonedStartingPoint = this.clonedPolygon.getVertex(startingPointIndex);
-
-    this.clonedReversePolygon = polygon.clone();
-    this.clonedReverseStartingPoint = this.clonedReversePolygon.getVertex(startingPointIndex);
   }
 
   public fix() {
@@ -39,26 +33,15 @@ export class ContinuousConditionFixer {
     conditionFixer.tryFix();
 
     if (conditionFixer.fixSuccessful) {
-      this.synchronizePoints(this.clonedPolygon, this.clonedReversePolygon);
-      this.synchronizePoints(this.clonedPolygon, this.polygon);
-
       return;
     }
 
-    this.clonedReverseStartingPoint.moveTo(this.startingPoint);
+    this.clonedStartingPoint.moveTo(this.startingPoint);
+    conditionFixer.reset();
+    conditionFixer.direction = FixingDirection.Reverse;
+    conditionFixer.tryFix();
 
-    const reverseConditionFixer = new ConditionFixer(
-      this.clonedReversePolygon,
-      this.clonedReverseStartingPoint,
-      [],
-      FixingDirection.Reverse
-    );
-    reverseConditionFixer.tryFix();
-
-    if (reverseConditionFixer.fixSuccessful) {
-      this.synchronizePoints(this.clonedReversePolygon, this.clonedPolygon);
-      this.synchronizePoints(this.clonedReversePolygon, this.polygon);
-
+    if (conditionFixer.fixSuccessful) {
       return;
     }
 
@@ -68,14 +51,9 @@ export class ContinuousConditionFixer {
       clonedPoint.moveTo(Point.add(clonedPoint, translationVector));
     });
     this.clonedStartingPoint.moveTo(this.startingPoint);
-
-    this.synchronizePoints(this.clonedPolygon, this.polygon);
-    this.synchronizePoints(this.clonedPolygon, this.clonedReversePolygon);
   }
 
-  private synchronizePoints(source: Polygon, destination: Polygon) {
-    destination.getVertices().forEach((originalPoint, index) => {
-      originalPoint.moveTo(source.getVertex(index));
-    });
+  public propagateChangesToOriginalPolygon() {
+    this.polygon.moveTo(this.clonedPolygon);
   }
 }
