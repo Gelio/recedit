@@ -17,8 +17,8 @@ export class Point {
   }
 
   constructor(x: number, y: number) {
-    this._x = Math.round(x);
-    this._y = Math.round(y);
+    this._x = x;
+    this._y = y;
   }
 
   public static add(p1: Point, p2: Point): Point {
@@ -124,8 +124,8 @@ export class Point {
   }
 
   private moveToCoordinates(x: number, y: number) {
-    this._x = Math.round(x);
-    this._y = Math.round(y);
+    this._x = x;
+    this._y = y;
 
     if (this.moveCallback) {
       this.moveCallback();
