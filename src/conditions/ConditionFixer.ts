@@ -3,17 +3,24 @@ import { Point } from 'common/Point';
 import { Polygon } from 'common/Polygon';
 import { LineCondition } from 'conditions/LineCondition';
 
+export enum FixingDirection {
+  Normal,
+  Reverse
+}
+
 export class ConditionFixer {
   private readonly polygon: Polygon;
   private readonly startingPoint: Point;
   private readonly additionalLineConditions: LineCondition[];
+  private readonly direction: FixingDirection;
 
   private _fixSuccessful?: boolean;
 
-  constructor(polygon: Polygon, startingPoint: Point, additionalLineConditions: LineCondition[] = []) {
+  constructor(polygon: Polygon, startingPoint: Point, additionalLineConditions: LineCondition[] = [], direction = FixingDirection.Normal) {
     this.polygon = polygon;
     this.startingPoint = startingPoint;
     this.additionalLineConditions = additionalLineConditions;
+    this.direction = direction;
   }
 
   public get fixSuccessful(): boolean {
@@ -49,6 +56,10 @@ export class ConditionFixer {
   }
 
   private getNextPointIndex(currentPointIndex: number) {
-    return (currentPointIndex + 1) % this.polygon.getVerticesCount();
+    if (this.direction === FixingDirection.Reverse) {
+      return this.polygon.getPreviousPointIndex(currentPointIndex);
+    }
+
+    return this.polygon.getNextPointIndex(currentPointIndex);
   }
 }
