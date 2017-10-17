@@ -9,7 +9,8 @@ const configuration = {
   hitTolerance: 10,
   minPolygonPoints: 3,
   doubleClickMaxDelay: 500,
-  displayPathGhostWhenDragging: false
+  displayPathGhostWhenDragging: false,
+  epsilon: 10e-4
 };
 
 export {
