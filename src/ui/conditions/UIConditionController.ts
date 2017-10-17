@@ -9,7 +9,7 @@ import { EventAggregator } from 'events/EventAggregator';
 import { LineClickEvent } from 'events/LineClickEvent';
 import { LEX } from 'LEX';
 
-import { ConditionFixer } from 'conditions/ConditionFixer';
+import { ConditionFixer, FixingDirection } from 'conditions/ConditionFixer';
 import { ConditionMatcher } from 'conditions/ConditionMatcher';
 
 import { RenderEvent } from 'events/RenderEvent';
@@ -87,37 +87,41 @@ export class UIConditionController implements UIService {
     }
 
     if (!lineCondition.isMet()) {
-      const realPolygon = lineCondition.polygon;
-      const p1Index = realPolygon.findPointIndex(lineCondition.line.p1);
-      const p2Index = realPolygon.findPointIndex(lineCondition.line.p2);
-      const polygonClone = realPolygon.clone();
-
-      const conditionFixer = new ConditionFixer(polygonClone, polygonClone.getVertex(p1Index), [
-        lineCondition.duplicateForNewLine(
-          new Line(polygonClone.getVertex(p1Index), polygonClone.getVertex(p2Index)),
-          polygonClone
-        )
-      ]);
-      conditionFixer.tryFix();
-
-      if (!conditionFixer.fixSuccessful) {
-        return console.log('Fix not successful');
-      }
-
-      polygonClone.getVertices().forEach((point, index) => {
-        realPolygon.getVertex(index).moveTo(point);
-      });
-
-      console.log('Forced condition to meet');
+      this.fixUnmetLineCondition(lineCondition);
     }
 
     lineCondition.polygon.addLineCondition(lineCondition);
     this.eventAggregator.dispatchEvent(new RenderEvent());
     this.eventAggregator.dispatchEvent(new SyncComponentsEvent());
     this.conditionPicker.updateButtons();
+  }
 
-    console.log('New condition', lineCondition);
-    console.log('Is met:', lineCondition.isMet());
+  private fixUnmetLineCondition(lineCondition: LineCondition) {
+    const realPolygon = lineCondition.polygon;
+    const p1Index = realPolygon.findPointIndex(lineCondition.line.p1);
+    const p2Index = realPolygon.findPointIndex(lineCondition.line.p2);
+    const polygonClone = realPolygon.clone();
+
+    const conditionFixer = new ConditionFixer(polygonClone, polygonClone.getVertex(p1Index), [
+      lineCondition.duplicateForNewLine(
+        new Line(polygonClone.getVertex(p1Index), polygonClone.getVertex(p2Index)),
+        polygonClone
+      )
+    ]);
+    conditionFixer.tryFix();
+
+    if (conditionFixer.fixSuccessful) {
+      return realPolygon.moveTo(polygonClone);
+    }
+
+    conditionFixer.reset();
+    conditionFixer.direction = FixingDirection.Reverse;
+    polygonClone.moveTo(realPolygon);
+    conditionFixer.tryFix();
+
+    if (!conditionFixer.fixSuccessful) {
+      alert('Cannot add a condition');
+    }
   }
 
   private onRemoveCondition(event: CustomEvent) {
