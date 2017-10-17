@@ -95,6 +95,7 @@ export class PointDraggingService implements UIService {
 
     if (this.continuousConditionFixer) {
       this.continuousConditionFixer.fix();
+      this.continuousConditionFixer.propagateChangesToOriginalPolygon();
     }
 
     if (configuration.pointWiggleWhenDragging) {
