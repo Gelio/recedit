@@ -37,6 +37,11 @@ export class InstructionsDialog extends HTMLElement {
     this.appendChild(this.dialogContainer);
     this.dismissButton.addEventListener('click', this.dismiss);
     this.overlay.addEventListener('click', this.dismiss);
+
+    requestAnimationFrame(() => {
+      this.overlay.classList.add('instructions-dialog__overlay--active');
+      this.dialogContainer.classList.add('instructions-dialog--active');
+    });
   }
 
   public disconnectedCallback() {
@@ -44,6 +49,9 @@ export class InstructionsDialog extends HTMLElement {
     this.removeChild(this.dialogContainer);
     this.dismissButton.removeEventListener('click', this.dismiss);
     this.overlay.removeEventListener('click', this.dismiss);
+
+    this.overlay.classList.remove('instructions-dialog__overlay--active');
+    this.dialogContainer.classList.remove('instructions-dialog--active');
   }
 
   private dismiss() {

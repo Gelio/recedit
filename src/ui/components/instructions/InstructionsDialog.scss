@@ -13,7 +13,13 @@ $zIndex: 2;
   width: 100vw;
   height: 100vh;
 
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: #000;
+  opacity: 0;
+  transition: opacity 250ms ease-in-out;
+}
+
+.instructions-dialog__overlay--active {
+  opacity: 0.5;
 }
 
 .instructions-dialog {
@@ -22,7 +28,7 @@ $zIndex: 2;
   left: 50%;
   z-index: $zIndex;
 
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) scale(0, 0);
 
   background-color: rgb(31, 53, 15);
   border: solid 1px black;
@@ -31,6 +37,12 @@ $zIndex: 2;
   padding: 2em;
   border-radius: 10px;
   box-shadow: 2px 2px 5px black;
+
+  transition: transform 250ms ease-in-out;
+}
+
+.instructions-dialog--active {
+  transform: translate(-50%, -50%) scale(1, 1);
 }
 
 .instructions-dialog__title {
