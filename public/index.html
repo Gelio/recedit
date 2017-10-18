@@ -9,14 +9,16 @@
 </head>
 
 <body>
+  <header class="app-header">
+    <h1 class="app-name">Recedit</h1>
+    <app-instructions-button></app-instructions-button>
+  </header>
+
   <div class="main-container">
-    <h1>Recedit</h1>
     <main class="canvas-wrapper">
       <canvas id="main-canvas" class="main-canvas" width="800" height="600"></canvas>
       <div class="application-ui" id="application-ui"></div>
     </main>
-
-    <app-instructions-button></app-instructions-button>
   </div>
 
   <script src="bundle.js"></script>

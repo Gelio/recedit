@@ -39,6 +39,10 @@ export class FixedLengthLineCondition extends LineCondition {
     return new FixedLengthLineCondition(line, polygon, this.fixedLength);
   }
 
+  public getLabel() {
+    return this.fixedLength.toFixed(1);
+  }
+
   public verifyCanBeApplied() {
     return;
   }

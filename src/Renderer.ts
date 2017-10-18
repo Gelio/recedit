@@ -4,7 +4,11 @@ import { Line } from 'common/Line';
 import { LineProperties } from 'common/LineProperties';
 import { Path } from 'common/Path';
 import { Point } from 'common/Point';
+import { Polygon } from 'common/Polygon';
+import { LineCondition } from 'conditions/LineCondition';
 import { LineRasterizer } from 'line-rasterizer/LineRasterizer';
+
+import { configuration } from 'configuration';
 
 interface RendererDependencies {
   canvas: HTMLCanvasElement;
@@ -24,6 +28,7 @@ export class Renderer {
     }
 
     this.renderingContext = context;
+    this.renderingContext.font = configuration.canvasFont;
     this.lineRasterizer = dependencies.lineRasterizer;
     this.setFillColor(COLORS.BLACK);
   }
@@ -44,7 +49,7 @@ export class Renderer {
     if (args[0] instanceof Line) {
       return this.drawLineBetweenPoints(args[0].p1, args[0].p2, args[1]);
     } else {
-     return this.drawLineBetweenPoints(args[0], args[1], args[2]);
+      return this.drawLineBetweenPoints(args[0], args[1], args[2]);
     }
   }
 
@@ -54,6 +59,22 @@ export class Renderer {
     for (const line of path.getLineIterator()) {
       this.drawLine(line, pathLineProperties);
     }
+
+    if (path instanceof Polygon) {
+      this.drawLineConditions(path.getLineConditions());
+    }
+  }
+
+  public fillText(text: string, x: number, y: number): void;
+  public fillText(text: string, point: Point): void;
+  public fillText(text: string, pointOrX: number | Point, y?: number) {
+    let x = pointOrX;
+    if (typeof pointOrX === 'object' && pointOrX instanceof Point) {
+      x = pointOrX.x;
+      y = pointOrX.y;
+    }
+
+    this.renderingContext.fillText(text, <number>x, <number>y);
   }
 
   public clear() {
@@ -64,7 +85,11 @@ export class Renderer {
     this.renderingContext.fillStyle = color.fillStyle;
   }
 
-  private drawLineBetweenPoints(startPoint: Point, endPoint: Point, lineProperties: LineProperties) {
+  private drawLineBetweenPoints(
+    startPoint: Point,
+    endPoint: Point,
+    lineProperties: LineProperties
+  ) {
     const rasterizedLinePoints = this.lineRasterizer.rasterizeLine(
       startPoint,
       endPoint,
@@ -73,5 +98,14 @@ export class Renderer {
 
     this.setFillColor(lineProperties.color);
     rasterizedLinePoints.forEach(point => this.drawPoint(point));
+  }
+
+  private drawLineConditions(lineConditions: LineCondition[]) {
+    lineConditions.forEach(lineCondition => {
+      this.fillText(
+        lineCondition.getLabel(),
+        Point.add(lineCondition.line.getMiddlePoint(), configuration.lineConditionLabelOffset)
+      );
+    });
   }
 }

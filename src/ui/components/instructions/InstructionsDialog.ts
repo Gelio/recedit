@@ -29,22 +29,32 @@ export class InstructionsDialog extends HTMLElement {
 
     this.dialogContainer.appendChild(this.dismissButton);
 
-    this.onDismissButtonClick = this.onDismissButtonClick.bind(this);
+    this.dismiss = this.dismiss.bind(this);
   }
 
   public connectedCallback() {
     this.appendChild(this.overlay);
     this.appendChild(this.dialogContainer);
-    this.dismissButton.addEventListener('click', this.onDismissButtonClick);
+    this.dismissButton.addEventListener('click', this.dismiss);
+    this.overlay.addEventListener('click', this.dismiss);
+
+    requestAnimationFrame(() => {
+      this.overlay.classList.add('instructions-dialog__overlay--active');
+      this.dialogContainer.classList.add('instructions-dialog--active');
+    });
   }
 
   public disconnectedCallback() {
     this.removeChild(this.overlay);
     this.removeChild(this.dialogContainer);
-    this.dismissButton.removeEventListener('click', this.onDismissButtonClick);
+    this.dismissButton.removeEventListener('click', this.dismiss);
+    this.overlay.removeEventListener('click', this.dismiss);
+
+    this.overlay.classList.remove('instructions-dialog__overlay--active');
+    this.dialogContainer.classList.remove('instructions-dialog--active');
   }
 
-  private onDismissButtonClick() {
+  private dismiss() {
     this.remove();
   }
 

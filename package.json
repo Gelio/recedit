@@ -6,6 +6,7 @@
   "author": "Grzegorz Rozdzialik <voreny.gelio@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@webcomponents/webcomponentsjs": "^1.0.14",
     "normalize.css": "^7.0.0"
   },
   "devDependencies": {
@@ -51,6 +52,9 @@
       "jsx",
       "json"
     ],
-    "moduleDirectories": ["src", "node_modules"]
+    "moduleDirectories": [
+      "src",
+      "node_modules"
+    ]
   }
 }

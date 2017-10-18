@@ -2,6 +2,15 @@ import { Line } from 'common/Line';
 import { Point } from 'common/Point';
 import { Polygon } from 'common/Polygon';
 import { LineCondition } from 'conditions/LineCondition';
+import { configuration } from 'configuration';
+
+const maxDeviation = configuration.lineDeviationAllowanceInDegrees;
+
+const allowedDegreeRanges = [
+  [0, maxDeviation],
+  [180 - maxDeviation, 180 + maxDeviation],
+  [360 - maxDeviation, 360]
+];
 
 export class HorizontalLineCondition extends LineCondition {
   public isMet(): boolean {
@@ -25,9 +34,13 @@ export class HorizontalLineCondition extends LineCondition {
   public verifyCanBeApplied() {
     const angle = Point.getAngle(this.line.p1, this.line.p2);
 
-    if ((angle > 30 && angle < 150) || (angle > 210 && angle < 330)) {
+    if (!allowedDegreeRanges.some(degreeRange => angle >= degreeRange[0] && angle <= degreeRange[1])) {
       throw new Error('Line is not horizontal enough');
     }
+  }
+
+  public getLabel() {
+    return '-';
   }
 
   private alignPointsHorizontally(subject: Point, destination: Point) {
