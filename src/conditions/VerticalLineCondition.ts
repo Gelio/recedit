@@ -38,6 +38,10 @@ export class VerticalLineCondition extends LineCondition {
     }
   }
 
+  public getLabel() {
+    return '|';
+  }
+
   private alignPointsVertically(subject: Point, destination: Point) {
     subject.moveTo(new Point(destination.x, subject.y));
   }

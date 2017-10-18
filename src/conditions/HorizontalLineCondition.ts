@@ -39,6 +39,10 @@ export class HorizontalLineCondition extends LineCondition {
     }
   }
 
+  public getLabel() {
+    return '-';
+  }
+
   private alignPointsHorizontally(subject: Point, destination: Point) {
     subject.moveTo(new Point(subject.x, destination.y));
   }
