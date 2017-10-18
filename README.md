@@ -50,6 +50,33 @@ yarn watch:dev
 yarn watch:prod
 ```
 
+## Testing
+
+To run the tests, run one of the following commands:
+* `yarn test`
+* `yarn test:watch`
+
+The first one runs one round of tests and then reports the results.
+
+The second one runs the tests in watch mode, essentially executing them every time a file changes.
+It executes only the tests that are relevant to the file that has changed.
+
+### Coverage
+
+There is a possibility to get test coverage information. Run:
+``` bash
+yarn test:coverage
+```
+
+The test coverage data is placed in the `coverage` directory.
+
+### Linting
+
+To make sure there are no code style warnings or errors, run:
+``` bash
+yarn lint
+```
+
 ## Author
 
 The author of this project is [Grzegorz Rozdzialik](voreny.gelio@gmail.com).
