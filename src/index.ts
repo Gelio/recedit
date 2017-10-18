@@ -1,6 +1,8 @@
 import 'index.scss';
 import 'normalize.css';
 
+import '@webcomponents/webcomponentsjs/webcomponents-hi-sd-ce';
+
 import { Application } from 'Application';
 
 window.addEventListener('load', bootstrap, false);
