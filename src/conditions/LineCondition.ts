@@ -26,4 +26,8 @@ export class LineCondition {
   public verifyCanBeApplied() {
     throw new Error('Not implemented');
   }
+
+  public getLabel(): string {
+    throw new Error('Not implemented');
+  }
 }

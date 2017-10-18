@@ -1,5 +1,6 @@
 import { COLORS } from 'common/COLORS';
 import { LineProperties } from 'common/LineProperties';
+import { Point } from 'common/Point';
 
 const configuration = {
   newLinePreviewProperties: new LineProperties(COLORS.BLUE, 2),
@@ -11,7 +12,9 @@ const configuration = {
   doubleClickMaxDelay: 500,
   displayPathGhostWhenDragging: false,
   epsilon: 10e-4,
-  lineDeviationAllowanceInDegrees: 20
+  lineDeviationAllowanceInDegrees: 20,
+  canvasFont: '30pt serif',
+  lineConditionLabelOffset: new Point(5, 0)
 };
 
 export {
