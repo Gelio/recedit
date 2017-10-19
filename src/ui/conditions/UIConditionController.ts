@@ -91,9 +91,7 @@ export class UIConditionController implements UIService {
     }
 
     lineCondition.polygon.addLineCondition(lineCondition);
-    this.eventAggregator.dispatchEvent(new RenderEvent());
-    this.eventAggregator.dispatchEvent(new SyncComponentsEvent());
-    this.conditionPicker.updateButtons();
+    this.dispatchUpdate();
   }
 
   private fixUnmetLineCondition(lineCondition: LineCondition) {
@@ -128,6 +126,12 @@ export class UIConditionController implements UIService {
     const lineCondition: LineCondition = event.detail;
 
     lineCondition.polygon.removeLineCondition(lineCondition);
+    this.dispatchUpdate();
+  }
+
+  private dispatchUpdate() {
+    this.eventAggregator.dispatchEvent(new RenderEvent());
+    this.eventAggregator.dispatchEvent(new SyncComponentsEvent());
     this.conditionPicker.updateButtons();
   }
 }
