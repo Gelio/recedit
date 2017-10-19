@@ -29,7 +29,7 @@ export class FixedLengthConditionElement extends LineConditionElement {
         return null;
       }
 
-      length = parseInt(value, 10);
+      length = parseFloat(value);
     }
 
     return new FixedLengthLineCondition(
