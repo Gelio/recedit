@@ -27,6 +27,7 @@ export class ContinuousConditionFixer {
 
   public fix() {
     const lastValidPosition = this.clonedStartingPoint.clone();
+    this.clonedPolygon.moveTo(this.polygon);
     this.clonedStartingPoint.moveTo(this.startingPoint);
 
     const conditionFixer = new ConditionFixer(this.clonedPolygon, this.clonedStartingPoint, []);
@@ -37,6 +38,7 @@ export class ContinuousConditionFixer {
     }
 
     this.clonedStartingPoint.moveTo(this.startingPoint);
+    this.clonedPolygon.moveTo(this.polygon);
     conditionFixer.reset();
     conditionFixer.direction = FixingDirection.Reverse;
     conditionFixer.tryFix();
@@ -47,6 +49,7 @@ export class ContinuousConditionFixer {
 
     const translationVector = Point.subtract(this.startingPoint, lastValidPosition);
 
+    this.clonedPolygon.moveTo(this.polygon);
     this.clonedPolygon.getVertices().forEach(clonedPoint => {
       clonedPoint.moveTo(Point.add(clonedPoint, translationVector));
     });
