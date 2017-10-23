@@ -8,19 +8,17 @@ import { configuration } from 'configuration';
 
 export class FixedLengthLineCondition extends LineCondition {
   private readonly fixedLength: number;
-  private readonly fixedLengthSquared: number;
 
   constructor(line: Line, polygon: Polygon, length: number) {
     super(line, polygon);
 
     this.fixedLength = length;
-    this.fixedLengthSquared = Math.pow(length, 2);
   }
 
   public isMet(): boolean {
-    const lengthSquared = Point.getDistanceBetweenSquared(this.line.p1, this.line.p2);
+    const lengthSquared = Point.getDistanceBetween(this.line.p1, this.line.p2);
 
-    return Math.abs(lengthSquared - this.fixedLengthSquared) < configuration.epsilon;
+    return Math.abs(lengthSquared - this.fixedLength) < configuration.epsilon;
   }
 
   public fix(lockedPoint: Point) {

@@ -8,7 +8,7 @@ import { LEX } from 'LEX';
 import { Stage } from 'Stage';
 import { UIService } from 'ui/UIService';
 
-import { ContinuousConditionFixer } from 'conditions/ContinuousConditionFixer';
+import { ContinuousConditionFixer } from 'conditions/fixers/ContinuousConditionFixer';
 
 import { FinishPointDragEvent } from 'events/point-drag/FinishPointDragEvent';
 import { PointDragEvent } from 'events/point-drag/PointDragEvent';
