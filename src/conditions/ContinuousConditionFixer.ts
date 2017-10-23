@@ -26,37 +26,40 @@ export class ContinuousConditionFixer {
   }
 
   public fix() {
-    const lastValidPosition = this.clonedStartingPoint.clone();
+    const dragTranslationVector = Point.subtract(this.startingPoint, this.clonedStartingPoint);
     this.clonedPolygon.moveTo(this.polygon);
     this.clonedStartingPoint.moveTo(this.startingPoint);
 
     const conditionFixer = new ConditionFixer(this.clonedPolygon, this.clonedStartingPoint, []);
     conditionFixer.tryFix();
 
-    if (conditionFixer.fixSuccessful) {
-      return;
+    if (!conditionFixer.fixSuccessful) {
+      return this.dragWholePolygon(dragTranslationVector);
+    }
+
+    const lastLockedPointIndex = conditionFixer.lastLockedVertexIndex;
+    conditionFixer.reset();
+    conditionFixer.direction = FixingDirection.Reverse;
+
+    conditionFixer.tryFix(lastLockedPointIndex);
+    if (!conditionFixer.fixSuccessful) {
+      return this.dragWholePolygon(dragTranslationVector);
     }
 
     this.clonedStartingPoint.moveTo(this.startingPoint);
     this.clonedPolygon.moveTo(this.polygon);
-    conditionFixer.reset();
-    conditionFixer.direction = FixingDirection.Reverse;
-    conditionFixer.tryFix();
+    this.dragWholePolygon(dragTranslationVector);
+  }
 
-    if (conditionFixer.fixSuccessful) {
-      return;
-    }
+  public propagateChangesToOriginalPolygon() {
+    this.polygon.moveTo(this.clonedPolygon);
+  }
 
-    const translationVector = Point.subtract(this.startingPoint, lastValidPosition);
-
+  private dragWholePolygon(translationVector: Point) {
     this.clonedPolygon.moveTo(this.polygon);
     this.clonedPolygon.getVertices().forEach(clonedPoint => {
       clonedPoint.moveTo(Point.add(clonedPoint, translationVector));
     });
     this.clonedStartingPoint.moveTo(this.startingPoint);
-  }
-
-  public propagateChangesToOriginalPolygon() {
-    this.polygon.moveTo(this.clonedPolygon);
   }
 }

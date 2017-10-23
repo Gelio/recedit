@@ -16,6 +16,7 @@ export class ConditionFixer {
   private readonly additionalLineConditions: LineCondition[];
 
   private _fixSuccessful?: boolean;
+  private _lastLockedVertexIndex?: number;
 
   constructor(
     polygon: Polygon,
@@ -37,7 +38,15 @@ export class ConditionFixer {
     return this._fixSuccessful;
   }
 
-  public tryFix() {
+  public get lastLockedVertexIndex(): number {
+    if (this._lastLockedVertexIndex === undefined) {
+      throw new Error('tryFix needs to be called first');
+    }
+
+    return this._lastLockedVertexIndex;
+  }
+
+  public tryFix(pointIndexBoundary?: number) {
     if (this._fixSuccessful !== undefined) {
       throw new Error('ConditionFixer needs to be reset before fixing again');
     }
@@ -48,25 +57,39 @@ export class ConditionFixer {
     let lockedPointIndex = startingPointIndex;
     let currentPointIndex = this.getNextPointIndex(lockedPointIndex);
 
-    while (currentPointIndex !== startingPointIndex) {
+    if (!pointIndexBoundary) {
+      pointIndexBoundary = startingPointIndex;
+    }
+
+    do {
       const currentLine = new Line(points[lockedPointIndex], points[currentPointIndex]);
       const currentLineConditions = lineConditions.filter(lineCondition =>
         lineCondition.line.equals(currentLine)
       );
 
-      currentLineConditions
-        .filter(lineCondition => !lineCondition.isMet())
+      const unmetLineConditions = currentLineConditions
+        .filter(lineCondition => !lineCondition.isMet());
+
+      if (unmetLineConditions.length === 0) {
+        this._fixSuccessful = true;
+        this._lastLockedVertexIndex = lockedPointIndex;
+
+        return;
+      }
+
+      unmetLineConditions
         .forEach(lineCondition => lineCondition.fix(points[lockedPointIndex]));
 
       lockedPointIndex = currentPointIndex;
       currentPointIndex = this.getNextPointIndex(currentPointIndex);
-    }
+    } while (lockedPointIndex !== pointIndexBoundary);
 
-    this._fixSuccessful = lineConditions.every(lineCondition => lineCondition.isMet());
+    this._fixSuccessful = false;
   }
 
   public reset() {
     this._fixSuccessful = undefined;
+    this._lastLockedVertexIndex = undefined;
   }
 
   private getNextPointIndex(currentPointIndex: number) {
