@@ -11,9 +11,7 @@ function bootstrap(): void {
   const canvasId = 'main-canvas';
   const canvas = document.getElementById(canvasId);
   if (!canvas) {
-    console.error('Canvas with id', canvasId, 'not found');
-
-    return;
+    throw new Error(`Canvas with id ${canvasId} cannot be found`);
   }
 
   const application = new Application(<HTMLCanvasElement>canvas);
