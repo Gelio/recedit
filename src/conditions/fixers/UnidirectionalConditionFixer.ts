@@ -8,11 +8,11 @@ export enum FixingDirection {
   Reverse
 }
 
-export class ConditionFixer {
+export class UnidirectionalConditionFixer {
   public direction: FixingDirection;
+  public startingPoint: Point;
 
   private readonly polygon: Polygon;
-  private readonly startingPoint: Point;
   private readonly additionalLineConditions: LineCondition[];
 
   private _fixSuccessful?: boolean;
@@ -61,7 +61,8 @@ export class ConditionFixer {
       pointIndexBoundary = startingPointIndex;
     }
 
-    do {
+    // tslint:disable-next-line no-constant-condition
+    while (true) {
       const currentLine = new Line(points[lockedPointIndex], points[currentPointIndex]);
       const currentLineConditions = lineConditions.filter(lineCondition =>
         lineCondition.line.equals(currentLine)
@@ -77,12 +78,16 @@ export class ConditionFixer {
         return;
       }
 
+      if (currentPointIndex === pointIndexBoundary) {
+        break;
+      }
+
       unmetLineConditions
         .forEach(lineCondition => lineCondition.fix(points[lockedPointIndex]));
 
       lockedPointIndex = currentPointIndex;
       currentPointIndex = this.getNextPointIndex(currentPointIndex);
-    } while (lockedPointIndex !== pointIndexBoundary);
+    }
 
     this._fixSuccessful = false;
   }

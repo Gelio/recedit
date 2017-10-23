@@ -1,6 +1,7 @@
 import { Point } from 'common/Point';
 import { Polygon } from 'common/Polygon';
-import { ConditionFixer, FixingDirection } from 'conditions/ConditionFixer';
+
+import { BidirectionalConditionFixer } from 'conditions/fixers/BidirectionalConditionFixer';
 
 /**
  * Use when there is a need to fix conditions often (for instance when dragging).
@@ -30,25 +31,12 @@ export class ContinuousConditionFixer {
     this.clonedPolygon.moveTo(this.polygon);
     this.clonedStartingPoint.moveTo(this.startingPoint);
 
-    const conditionFixer = new ConditionFixer(this.clonedPolygon, this.clonedStartingPoint, []);
+    const conditionFixer = new BidirectionalConditionFixer(this.clonedPolygon, this.clonedStartingPoint, []);
     conditionFixer.tryFix();
 
     if (!conditionFixer.fixSuccessful) {
       return this.dragWholePolygon(dragTranslationVector);
     }
-
-    const lastLockedPointIndex = conditionFixer.lastLockedVertexIndex;
-    conditionFixer.reset();
-    conditionFixer.direction = FixingDirection.Reverse;
-
-    conditionFixer.tryFix(lastLockedPointIndex);
-    if (!conditionFixer.fixSuccessful) {
-      return this.dragWholePolygon(dragTranslationVector);
-    }
-
-    this.clonedStartingPoint.moveTo(this.startingPoint);
-    this.clonedPolygon.moveTo(this.polygon);
-    this.dragWholePolygon(dragTranslationVector);
   }
 
   public propagateChangesToOriginalPolygon() {
