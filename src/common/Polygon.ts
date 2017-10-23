@@ -63,11 +63,19 @@ export class Polygon extends Path {
       lineCondition.line.equals(previousLine)
     );
 
+
+
     if (matchingConditions.length > 0) {
-      throw new Error(
-        `Cannot insert a point because of an existing condition (${matchingConditions[0].constructor
-          .name})`
-      );
+      if (configuration.removeConditionsWhenInsertingPoints) {
+        matchingConditions.forEach(lineCondition => {
+          this.removeLineCondition(lineCondition);
+        });
+      } else {
+        throw new Error(
+          `Cannot insert a point because of an existing condition (${matchingConditions[0].constructor
+            .name})`
+        );
+      }
     }
 
     super.insertVertex(point, index);
