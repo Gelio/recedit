@@ -6,6 +6,7 @@ import { Stage } from 'Stage';
 import { UIConditionController } from 'ui/conditions/UIConditionController';
 import { MousePositionTransformer } from 'ui/MousePositionTransformer';
 import { NewPolygonUIController } from 'ui/NewPolygonUIController';
+import { PathDraggingService } from 'ui/PathDraggingService';
 import { PointDraggingService } from 'ui/PointDraggingService';
 import { PointInserterService } from 'ui/PointInserterService';
 import { PointRemoverService } from 'ui/PointRemoverService';
@@ -38,6 +39,7 @@ export class UIController {
 
   private readonly uiServices: UIService[] = [];
   private newPolygonUIController: NewPolygonUIController;
+  private pathDraggingService: PathDraggingService;
 
   constructor(dependencies: UIControllerDependencies) {
     this.canvas = dependencies.canvas;
@@ -46,6 +48,7 @@ export class UIController {
     this.eventAggregator = dependencies.eventAggregator;
 
     this.onClick = this.onClick.bind(this);
+    this.onMouseDown = this.onMouseDown.bind(this);
   }
 
   public init() {
@@ -58,6 +61,7 @@ export class UIController {
 
     this.mousePositionTransformer = new MousePositionTransformer(this.canvas);
     this.canvas.addEventListener('click', this.onClick);
+    this.canvas.addEventListener('mousedown', this.onMouseDown);
 
     this.createNewPolygonUIController();
     this.createPointDraggingService();
@@ -65,19 +69,35 @@ export class UIController {
     this.createPointRemoverService();
     this.createPointSyncService();
     this.createUIConditionController();
+    this.createPathDraggingService();
 
     this.uiServices.forEach(uiService => uiService.init());
   }
 
   public destroy() {
     this.canvas.removeEventListener('click', this.onClick);
+    this.canvas.removeEventListener('mousedown', this.onMouseDown);
 
     this.uiServices.forEach(uiService => uiService.destroy());
     this.uiServices.splice(0, this.uiServices.length);
   }
 
+  private onMouseDown(event: MouseEvent) {
+    if (!event.ctrlKey) {
+      return;
+    }
+
+    this.pathDraggingService.startMovingPath(event);
+
+    return false;
+  }
+
   private onClick(event: MouseEvent) {
     event.stopPropagation();
+
+    if (this.pathDraggingService.isDragging) {
+      return;
+    }
 
     const point = this.mousePositionTransformer.getPointFromMouseEvent(event);
 
@@ -153,5 +173,16 @@ export class UIController {
     });
 
     this.uiServices.push(uiConditionController);
+  }
+
+  private createPathDraggingService() {
+    this.pathDraggingService = new PathDraggingService({
+      canvas: this.canvas,
+      eventAggregator: this.eventAggregator,
+      mousePositionTransformer: this.mousePositionTransformer,
+      stage: this.stage
+    });
+
+    this.uiServices.push(this.pathDraggingService);
   }
 }
