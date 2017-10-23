@@ -63,8 +63,6 @@ export class Polygon extends Path {
       lineCondition.line.equals(previousLine)
     );
 
-
-
     if (matchingConditions.length > 0) {
       if (configuration.removeConditionsWhenInsertingPoints) {
         matchingConditions.forEach(lineCondition => {
