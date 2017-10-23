@@ -9,8 +9,8 @@ import { EventAggregator } from 'events/EventAggregator';
 import { LineClickEvent } from 'events/LineClickEvent';
 import { LEX } from 'LEX';
 
-import { ConditionFixer, FixingDirection } from 'conditions/ConditionFixer';
 import { ConditionMatcher } from 'conditions/ConditionMatcher';
+import { BidirectionalConditionFixer } from 'conditions/fixers/BidirectionalConditionFixer';
 
 import { RenderEvent } from 'events/RenderEvent';
 import { SyncComponentsEvent } from 'events/ui/SyncComponentsEvent';
@@ -91,9 +91,7 @@ export class UIConditionController implements UIService {
     }
 
     lineCondition.polygon.addLineCondition(lineCondition);
-    this.eventAggregator.dispatchEvent(new RenderEvent());
-    this.eventAggregator.dispatchEvent(new SyncComponentsEvent());
-    this.conditionPicker.updateButtons();
+    this.dispatchUpdate();
   }
 
   private fixUnmetLineCondition(lineCondition: LineCondition) {
@@ -102,7 +100,7 @@ export class UIConditionController implements UIService {
     const p2Index = realPolygon.findPointIndex(lineCondition.line.p2);
     const polygonClone = realPolygon.clone();
 
-    const conditionFixer = new ConditionFixer(polygonClone, polygonClone.getVertex(p1Index), [
+    const conditionFixer = new BidirectionalConditionFixer(polygonClone, polygonClone.getVertex(p1Index), [
       lineCondition.duplicateForNewLine(
         new Line(polygonClone.getVertex(p1Index), polygonClone.getVertex(p2Index)),
         polygonClone
@@ -110,24 +108,29 @@ export class UIConditionController implements UIService {
     ]);
     conditionFixer.tryFix();
 
-    if (conditionFixer.fixSuccessful) {
-      return realPolygon.moveTo(polygonClone);
+    if (!conditionFixer.fixSuccessful) {
+      conditionFixer.startingPoint = polygonClone.getVertex(p1Index);
+      conditionFixer.reset();
+      conditionFixer.tryFix();
     }
-
-    conditionFixer.reset();
-    conditionFixer.direction = FixingDirection.Reverse;
-    polygonClone.moveTo(realPolygon);
-    conditionFixer.tryFix();
 
     if (!conditionFixer.fixSuccessful) {
-      alert('Cannot add a condition');
+      return alert('Cannot add a condition');
     }
+
+    realPolygon.moveTo(polygonClone);
   }
 
   private onRemoveCondition(event: CustomEvent) {
     const lineCondition: LineCondition = event.detail;
 
     lineCondition.polygon.removeLineCondition(lineCondition);
+    this.dispatchUpdate();
+  }
+
+  private dispatchUpdate() {
+    this.eventAggregator.dispatchEvent(new RenderEvent());
+    this.eventAggregator.dispatchEvent(new SyncComponentsEvent());
     this.conditionPicker.updateButtons();
   }
 }

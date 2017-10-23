@@ -41,6 +41,8 @@ Przy poruszaniu wierzchołkiem wszystkie relacje zostają zachowane.
 
 Klawiszem _Escape_ możemy anulować dodawanie nowego wielokąta, o ile nie został on już zamknięty.
 
+Przytrzymanie klawisza _Ctrl_ pozwala ruszać całym wielokątem.
+
 
 ## Przyjęte założenia
 
@@ -76,6 +78,9 @@ Klawiszem _Escape_ możemy anulować dodawanie nowego wielokąta, o ile nie zost
 11. Do najbardziej wrażliwych i fundamentalnych elementów aplikacji stworzyłem testy jednostkowe.
 
     Sposób ich uruchomienia został opisany w `README.md`.
+
+12. Po wstawieniu nowego wierzchołka na środku krawędzi, która ma zdefiniowaną relację,
+    relacja jest usuwana.
 
 
 ## Implementacja algorytmu relacji
@@ -118,16 +123,23 @@ uznając wierzchołek, do którego dotarliśmy wcześniej, jako ten, który ma z
 Dzięki temu unikamy wielokrotnego poprawiania tego samego punktu.
 Po poprawieniu relacji mamy pewność, że jest spełniona. Wtedy rozpatrujemy następną krawędź.
 
-Robimy tak, aż trafimy na krawędź, której jednym z wierzchołków będzie wierzchołek startowy.
-Jeżeli jest na niej zdefiniowana pewna relacja, która jest spełniona, to z sukcesem
-udało się naprawić relacje. Jeżeli nie jest spełniona, to naprawienie relacji w tym kierunku
-nie jest możliwe.
+Robimy tak, aż trafimy na krawędź, która nie ma relacji, lub jej relacja jest spełniona, lub
+dotarliśmy do wierzchołka startowego.
 
-W takim wypadku należy przywrócić położenie wierzchołków do położenia początkowego i zacząć
-od nowa, tym razem zmniejszając indeks aktualnie rozpatrywanego wierzchołka. Jeżeli po przejściu
-całego wielokąta i poprawieniu go na ostatniej krawędzi jest zdefiniowana relacja, która nie jest
-spełniona, to w tą stronę również nie da się naprawić relacji. W przeciwnym wypadku udało się z
-naprawić relacje.
+Jeżeli dotarliśmy do wierzchołka startowego to oznacza, że nie da się poprawić relacji.
+
+W przeciwnym wypadku w tą stronę udało się poprawić relacje. Oznaczmy przez v wierzchołek, który
+jako ostatni został uznany za zablokowany przy poprawianiu relacji.
+
+Następnie zaczynamy sprawdzanie od wierzchołka początkowego zmniejszając indeks aktualnie
+rozpatrywanego wierzchołka (idziemy w drugą stronę). Ponawiamy poruszanie się o 1 krawędź,
+sprawdzanie relacji i jej naprawianie do momentu, gdy dotrzemy do wierzchołka v lub trafimy na
+krawędź, która nie ma relacji lub jej relacja jest spełniona.
+
+Jeżeli dotarliśmy do wierzchołka v i krawędź ma relację, która nie jest spełniona, to w ogólności
+nie da się poprawić relacji.
+
+W przciwnym wypadku udało się naprawić relacje.
 
 
 ### Zachowanie relacji podczas dodawania nowej relacji
@@ -136,8 +148,11 @@ Przy dodawaniu nowej relacji najpierw sprawdzamy metodą `verifyCanBeApplied` cz
 warunki początkowe. Jeżeli tak, to dodajemy ją i wykonujemy algorytm poprawiania relacji
 zaczynając od jednego z wierzchołków krawędzi, do której dodajemy relacje.
 
-Jeżeli nie udało się naprawić wielokąta, to relację usuwamy i zwracamy informację, że nie da się
-dodać tej relacji
+Jeżeli nie udało się naprawić wielokąta, to wykonujemy algorytm poprawiania relacji zaczynając
+od drugiego z wierzchołków krawędzi, do której dodajemy relację.
+
+Jeżeli w tym przypadku również nie udało się naprawić wielokąta, to relację usuwamy i zwracamy
+informację, że nie da się dodać tej relacji.
 
 ### Zachowanie relacji podczas przesuwania wierzchołka
 

@@ -95,4 +95,44 @@ export class Path {
   public findPointIndex(point: Point) {
     return this.vertices.indexOf(point);
   }
+
+  public getBoundingBox() {
+    let minX = Infinity;
+    let maxX = 0;
+    let minY = Infinity;
+    let maxY = 0;
+
+    this.vertices.forEach(point => {
+      if (point.x < minX) {
+        minX = point.x;
+      }
+      if (point.x > maxX) {
+        maxX = point.x;
+      }
+      if (point.y < minY) {
+        minY = point.y;
+      }
+      if (point.y > maxY) {
+        maxY = point.y;
+      }
+    });
+
+    return {
+      minX,
+      maxX,
+      minY,
+      maxY
+    };
+  }
+
+  public isPointInBoundingBox(point: Point) {
+    const boundingBox = this.getBoundingBox();
+
+    return (
+      point.x >= boundingBox.minX &&
+      point.x <= boundingBox.maxX &&
+      point.y >= boundingBox.minY &&
+      point.y <= boundingBox.maxY
+    );
+  }
 }

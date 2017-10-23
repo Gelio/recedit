@@ -15,6 +15,7 @@
     "css-loader": "^0.28.7",
     "eslint": "^4.8.0",
     "extract-text-webpack-plugin": "^3.0.1",
+    "gh-pages": "^1.0.0",
     "jest": "^21.2.1",
     "node-sass": "^4.5.3",
     "sass-loader": "^6.0.6",
@@ -30,6 +31,7 @@
   },
   "scripts": {
     "start": "npm run serve:dev",
+    "deploy": "gh-pages -d dist",
     "serve:dev": "webpack-dev-server",
     "build:dev": "webpack",
     "build:prod": "webpack -p",

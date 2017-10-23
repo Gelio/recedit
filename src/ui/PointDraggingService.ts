@@ -8,7 +8,7 @@ import { LEX } from 'LEX';
 import { Stage } from 'Stage';
 import { UIService } from 'ui/UIService';
 
-import { ContinuousConditionFixer } from 'conditions/ContinuousConditionFixer';
+import { ContinuousConditionFixer } from 'conditions/fixers/ContinuousConditionFixer';
 
 import { FinishPointDragEvent } from 'events/point-drag/FinishPointDragEvent';
 import { PointDragEvent } from 'events/point-drag/PointDragEvent';
@@ -91,6 +91,12 @@ export class PointDraggingService implements UIService {
 
   private onPointDrag(event: PointDragEvent) {
     const { component, newPosition } = event.payload;
+
+    for (const point of component.path.getVerticesIterator()) {
+      if (point.equals(newPosition)) {
+        return;
+      }
+    }
 
     component.point.moveTo(newPosition);
 

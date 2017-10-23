@@ -11,10 +11,11 @@ const configuration = {
   minPolygonPoints: 3,
   doubleClickMaxDelay: 500,
   displayPathGhostWhenDragging: false,
-  epsilon: 10e-4,
+  epsilon: 0.1,
   lineDeviationAllowanceInDegrees: 20,
   canvasFont: '30pt serif',
-  lineConditionLabelOffset: new Point(5, 0)
+  lineConditionLabelOffset: new Point(5, 0),
+  removeConditionsWhenInsertingPoints: true
 };
 
 export {
