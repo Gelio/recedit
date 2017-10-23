@@ -92,6 +92,12 @@ export class PointDraggingService implements UIService {
   private onPointDrag(event: PointDragEvent) {
     const { component, newPosition } = event.payload;
 
+    for (const point of component.path.getVerticesIterator()) {
+      if (point.equals(newPosition)) {
+        return;
+      }
+    }
+
     component.point.moveTo(newPosition);
 
     if (this.continuousConditionFixer) {
