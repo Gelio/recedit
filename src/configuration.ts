@@ -14,7 +14,8 @@ const configuration = {
   epsilon: 0.1,
   lineDeviationAllowanceInDegrees: 20,
   canvasFont: '30pt serif',
-  lineConditionLabelOffset: new Point(5, 0)
+  lineConditionLabelOffset: new Point(5, 0),
+  removeConditionsWhenInsertingPoints: true
 };
 
 export {
