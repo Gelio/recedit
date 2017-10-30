@@ -2,6 +2,13 @@ import { Line } from 'common/Line';
 import { Point } from 'common/Point';
 import { Polygon } from 'common/Polygon';
 
+export interface SerializableLineCondition {
+  name: string;
+  p1Index: number;
+  p2Index: number;
+  [property: string]: number | string;
+}
+
 export class LineCondition {
   public readonly line: Line;
   public readonly polygon: Polygon;
@@ -28,6 +35,10 @@ export class LineCondition {
   }
 
   public getLabel(): string {
+    throw new Error('Not implemented');
+  }
+
+  public toSerializableObject(): SerializableLineCondition {
     throw new Error('Not implemented');
   }
 }

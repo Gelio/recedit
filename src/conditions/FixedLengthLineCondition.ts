@@ -41,6 +41,15 @@ export class FixedLengthLineCondition extends LineCondition {
     return this.fixedLength.toFixed(1);
   }
 
+  public toSerializableObject() {
+    return {
+      name: FixedLengthLineCondition.name,
+      p1Index: this.polygon.findPointIndex(this.line.p1),
+      p2Index: this.polygon.findPointIndex(this.line.p2),
+      fixedLength: this.fixedLength
+    };
+  }
+
   public verifyCanBeApplied() {
     return;
   }

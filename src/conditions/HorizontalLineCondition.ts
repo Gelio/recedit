@@ -43,6 +43,14 @@ export class HorizontalLineCondition extends LineCondition {
     return '-';
   }
 
+  public toSerializableObject() {
+    return {
+      name: HorizontalLineCondition.name,
+      p1Index: this.polygon.findPointIndex(this.line.p1),
+      p2Index: this.polygon.findPointIndex(this.line.p2)
+    };
+  }
+
   private alignPointsHorizontally(subject: Point, destination: Point) {
     subject.moveTo(new Point(subject.x, destination.y));
   }
