@@ -4,6 +4,15 @@ import { LineProperties } from 'common/LineProperties';
 import { Point } from 'common/Point';
 import { configuration } from 'configuration';
 
+export interface SerializablePath {
+  lineProperties: LineProperties;
+  closed: boolean;
+  vertices: {
+    x: number;
+    y: number;
+  }[];
+}
+
 export class Path {
   public closed: boolean = false;
   public lineProperties: LineProperties;
@@ -12,6 +21,15 @@ export class Path {
   constructor(vertices: Point[], lineProperties: LineProperties) {
     this.vertices = vertices;
     this.lineProperties = lineProperties;
+  }
+
+  public static fromSerializablePath(serializablePath: SerializablePath) {
+    const realPoints = serializablePath.vertices.map(vertex => new Point(vertex.x, vertex.y));
+    const realLineProperties = new LineProperties(serializablePath.lineProperties.color, serializablePath.lineProperties.thickness);
+    const path = new Path(realPoints, realLineProperties);
+    path.closed = serializablePath.closed;
+
+    return path;
   }
 
   public *getVerticesIterator() {
@@ -134,5 +152,16 @@ export class Path {
       point.y >= boundingBox.minY &&
       point.y <= boundingBox.maxY
     );
+  }
+
+  public toSerializableObject(): SerializablePath {
+    return {
+      lineProperties: this.lineProperties.clone(),
+      closed: this.closed,
+      vertices: this.vertices.map(vertex => ({
+        x: vertex.x,
+        y: vertex.y
+      }))
+    };
   }
 }

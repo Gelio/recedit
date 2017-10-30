@@ -8,6 +8,8 @@ Edytor wielokątów z możliwością ustawienia relacji krawędzi:
 * pionowa
 * o określonej długości
 
+Aplikację bez budowania można uruchomić otwierając w przeglądarce plik _index.html_ z katalogu dist.
+
 
 ## Klawiszologia
 

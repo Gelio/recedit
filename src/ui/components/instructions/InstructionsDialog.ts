@@ -69,7 +69,9 @@ export class InstructionsDialog extends HTMLElement {
       'Double click on an edge to add a vertex in the middle of it',
       'Double click on a vertex to remove it',
       'Click an edge to add or remove an edge relation',
-      'Pressing Ctrl allows dragging a whole polygon'
+      'Pressing Ctrl allows dragging a whole polygon',
+      'Save allows you to export all the polygons on the screen (along with their relations)',
+      'Load allows you to restore the state (from a string created by Save button)'
     ];
 
     usage.map(usageItemText => this.createUsageListItem(usageItemText))

@@ -42,6 +42,14 @@ export class VerticalLineCondition extends LineCondition {
     return '|';
   }
 
+  public toSerializableObject() {
+    return {
+      name: VerticalLineCondition.name,
+      p1Index: this.polygon.findPointIndex(this.line.p1),
+      p2Index: this.polygon.findPointIndex(this.line.p2)
+    };
+  }
+
   private alignPointsVertically(subject: Point, destination: Point) {
     subject.moveTo(new Point(destination.x, subject.y));
   }
