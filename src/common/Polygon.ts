@@ -1,10 +1,15 @@
 import { Line } from 'common/Line';
 import { LineProperties } from 'common/LineProperties';
-import { Path } from 'common/Path';
+import { Path, SerializablePath } from 'common/Path';
 import { Point } from 'common/Point';
 import { configuration } from 'configuration';
 
-import { LineCondition } from 'conditions/LineCondition';
+import { ConditionDeserializer } from 'conditions/ConditionDeserializer';
+import { LineCondition, SerializableLineCondition } from 'conditions/LineCondition';
+
+export interface SerializablePolygon extends SerializablePath {
+  lineConditions: SerializableLineCondition[];
+}
 
 export class Polygon extends Path {
   private lineConditions: LineCondition[];
@@ -28,6 +33,19 @@ export class Polygon extends Path {
     super(vertices, lineProperties);
     this.closed = true;
     this.lineConditions = [];
+  }
+
+  public static fromSerializablePolygon(serializablePolygon: SerializablePolygon) {
+    const path = Path.fromSerializablePath(serializablePolygon);
+    const polygon = new Polygon(path);
+    const conditionDeserializer = new ConditionDeserializer();
+
+    serializablePolygon.lineConditions.forEach(condition => {
+      const deserializedCondition = conditionDeserializer.deserializeCondition(polygon, condition);
+      polygon.addLineCondition(deserializedCondition);
+    });
+
+    return polygon;
   }
 
   private static ensureVerticesLength(vertices: Point[]) {
@@ -157,5 +175,14 @@ export class Polygon extends Path {
     }
 
     this.vertices.forEach((point, index) => point.moveTo(polygon.getVertex(index)));
+  }
+
+  public toSerializableObject(): SerializablePolygon {
+    const pathSerializableObject = super.toSerializableObject();
+    const serializedLineConditions = this.lineConditions.map(lineCondition => lineCondition.toSerializableObject());
+
+    return Object.assign({}, pathSerializableObject, {
+      lineConditions: serializedLineConditions
+    });
   }
 }

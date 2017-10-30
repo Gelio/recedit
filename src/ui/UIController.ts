@@ -20,6 +20,8 @@ import { LineClickEvent } from 'events/LineClickEvent';
 
 import 'ui/components/instructions/InstructionsButton';
 import 'ui/components/instructions/InstructionsDialog';
+import { LoadButton } from 'ui/components/serialization/LoadButton';
+import { SaveButton } from 'ui/components/serialization/SaveButton';
 
 interface UIControllerDependencies {
   canvas: HTMLCanvasElement;
@@ -36,6 +38,7 @@ export class UIController {
 
   private mousePositionTransformer: MousePositionTransformer;
   private applicationUIContainer: HTMLElement;
+  private serializationContainer: HTMLElement;
 
   private readonly uiServices: UIService[] = [];
   private newPolygonUIController: NewPolygonUIController;
@@ -72,6 +75,8 @@ export class UIController {
     this.createPathDraggingService();
 
     this.uiServices.forEach(uiService => uiService.init());
+
+    this.addSerializationButtons();
   }
 
   public destroy() {
@@ -80,6 +85,29 @@ export class UIController {
 
     this.uiServices.forEach(uiService => uiService.destroy());
     this.uiServices.splice(0, this.uiServices.length);
+
+    // tslint:disable-next-line
+    this.serializationContainer.innerHTML = '';
+  }
+
+  private addSerializationButtons() {
+    const serializationContainer = document.getElementById('serialization-container');
+    if (!serializationContainer) {
+      throw new Error('Serialization container not found');
+    }
+
+    this.serializationContainer = serializationContainer;
+
+    const loadButton = new LoadButton({
+      eventAggregator: this.eventAggregator,
+      stage: this.stage
+    });
+    const saveButton = new SaveButton({
+      stage: this.stage
+    });
+
+    this.serializationContainer.appendChild(loadButton);
+    this.serializationContainer.appendChild(saveButton);
   }
 
   private onMouseDown(event: MouseEvent) {
